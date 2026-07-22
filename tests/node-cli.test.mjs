@@ -7,7 +7,7 @@ const CLI = "bundle/backlog-api.mjs";
 test("CLI metadata commands do not require credentials", () => {
   const version = run(["--version"]);
   assert.equal(version.status, 0);
-  assert.equal(version.stdout, "0.3.2\n");
+  assert.equal(version.stdout, "0.3.3\n");
   assert.equal(version.stderr, "");
 
   const help = run(["--help"]);
@@ -16,6 +16,7 @@ test("CLI metadata commands do not require credentials", () => {
   assert.match(help.stdout, /backlog-api call <operation>/);
   assert.match(help.stdout, /machine-readable JSON to stdout/);
   assert.match(help.stdout, /--confirm-destructive/);
+  assert.match(help.stdout, /--verbose/);
   assert.match(help.stdout, /Exit codes:/);
 
   const catalog = JSON.parse(run(["tools", "list"]).stdout);
@@ -56,6 +57,16 @@ test("CLI returns a structured confirmation error for destructive calls", () => 
   const body = JSON.parse(result.stdout);
   assert.equal(body.success, false);
   assert.equal(body.diagnostics[0].code, "CONFIRMATION_REQUIRED");
+});
+
+test("CLI reports invalid fields as a structured usage failure", () => {
+  const result = run(
+    ["call", "get_issue", "--input", "-"],
+    '{"issueKey":"TEST-1","fields":"id summary"}'
+  );
+  assert.equal(result.status, 2);
+  assert.equal(result.stderr, "");
+  assert.equal(JSON.parse(result.stdout).diagnostics[0].code, "INVALID_FIELDS");
 });
 
 function run(args, input = "") {

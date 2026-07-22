@@ -14,7 +14,7 @@ fs.mkdirSync(bundleDir, { recursive: true });
 fs.mkdirSync(distDir, { recursive: true });
 
 const cliBuild = await build({
-  entryPoints: [path.resolve(root, "src", "cli.mjs")],
+  entryPoints: [path.resolve(root, "src", "cli.ts")],
   outfile: path.resolve(bundleDir, "backlog-api.mjs"),
   bundle: true,
   platform: "node",
@@ -31,7 +31,7 @@ fs.writeFileSync(
 );
 
 const runtimeBuild = await build({
-  entryPoints: [path.resolve(root, "src", "runtime.mjs")],
+  entryPoints: [path.resolve(root, "src", "runtime.ts")],
   outfile: path.resolve(bundleDir, "backlog-api-runtime.mjs"),
   bundle: true,
   platform: "node",
@@ -57,6 +57,7 @@ execFileSync(
     sourcesPath,
     "src",
     "docs/traceability",
+    "tsconfig.json",
     "package.json",
     "package-lock.json",
     "LICENSE",

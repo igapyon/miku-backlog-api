@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 
 import fs from "node:fs";
-import { listOperations } from "./core/catalog.mjs";
-import { getMapping } from "./core/traceability.mjs";
-import { runOperation } from "./core/run-operation.mjs";
-import { product } from "./runtime.mjs";
+import { listOperations } from "./core/catalog.js";
+import type {
+  BacklogAccessEvent,
+  CrudPermission,
+  RunOperationOptions
+} from "./core/contracts.js";
+import { getMapping } from "./core/traceability.js";
+import { runOperation } from "./core/run-operation.js";
+import { formatBacklogAccessEvent } from "./core/verbose-format.js";
+import { product } from "./runtime.js";
 
 const HELP = `backlog-api ${product.version} — JSON CLI for Backlog API operations
 
@@ -14,7 +20,7 @@ Usage:
   backlog-api tools list
   backlog-api trace [operation]
   backlog-api call <operation> [--input <file|->] [--allow <permissions>]
-      [--dry-run] [--confirm-destructive]
+      [--dry-run] [--confirm-destructive] [--verbose]
 
 Commands:
   --version
@@ -42,17 +48,22 @@ Call options:
                           READ. Values: READ, CREATE, UPDATE, DELETE.
   --dry-run               Validate and normalize input without invoking Backlog.
   --confirm-destructive   Explicitly authorize delete_* or broad reset calls.
+  --verbose               Write a safe summary of each Backlog API access to
+                          stderr. Arguments, credentials, and results are omitted.
 
 Input JSON:
   The input must be exactly one JSON object. Operation arguments are top-level
   properties. In a multi-organization setup, add "organization" to select a
-  configured Backlog connection; it is not forwarded to the Backlog API.
+  configured Backlog connection; it is not forwarded to the Backlog API. Add
+  "fields" with a GraphQL-style selection such as "{ id summary }" to return
+  only selected result fields.
 
 Output:
   "tools list", "trace", and "call" write machine-readable JSON to stdout.
   A call result contains schemaVersion, operation, success, diagnostics,
   trace, and either result or dryRun/input data. --help and --version are the
   only plain-text stdout commands. Unexpected CLI errors are written to stderr.
+  --verbose adds "verbose:" access events to stderr without changing stdout.
 
 Safety:
   Calls allow READ operations only by default. CREATE, UPDATE, and DELETE must
@@ -71,13 +82,15 @@ Environment:
 Exit codes:
   0  Successful metadata command or operation.
   1  Configuration, confirmation, organization, or Backlog API failure.
-  2  CLI usage error or operation input-schema failure.
+  2  CLI usage, fields-selection, or operation input-schema failure.
 
 Examples:
   backlog-api tools list
   backlog-api trace get_issue
   printf '{"issueKey":"PROJ-1"}\\n' | backlog-api call get_issue
+  printf '{"issueKey":"PROJ-1","fields":"{ id summary }"}\\n' | backlog-api call get_issue
   backlog-api call get_issue --input request.json --dry-run
+  backlog-api call get_issue --input request.json --verbose
   backlog-api call add_issue --input request.json --allow CREATE
   backlog-api call delete_issue --input request.json --allow DELETE --confirm-destructive
 `;
@@ -87,7 +100,7 @@ main().catch((error) => {
   process.exitCode = 1;
 });
 
-async function main() {
+async function main(): Promise<void> {
   const args = process.argv.slice(2);
   if (args.length === 0 || args.includes("--help") || args[0] === "help") {
     process.stdout.write(HELP);
@@ -125,15 +138,19 @@ async function main() {
       return;
     }
     const input = JSON.parse(await readInput(inputPath));
-    const result = await runOperation(args[1], input, {
+    const options: RunOperationOptions = {
       dryRun: args.includes("--dry-run"),
       confirmDestructive: args.includes("--confirm-destructive"),
       allowedPermissions
-    });
+    };
+    if (args.includes("--verbose")) {
+      options.onAccess = writeVerboseEvent;
+    }
+    const result = await runOperation(args[1], input, options);
     writeJson(result);
     if (!result.success) {
-      process.exitCode = result.diagnostics.some(
-        (diagnostic) => diagnostic.code === "INVALID_ARGUMENT"
+      process.exitCode = result.diagnostics.some((diagnostic) =>
+        diagnostic.code === "INVALID_ARGUMENT" || diagnostic.code === "INVALID_FIELDS"
       ) ? 2 : 1;
     }
     return;
@@ -143,7 +160,7 @@ async function main() {
   process.exitCode = 2;
 }
 
-function optionValue(args, name) {
+function optionValue(args: string[], name: string): string | undefined {
   const index = args.indexOf(name);
   if (index < 0) {
     return undefined;
@@ -155,23 +172,25 @@ function optionValue(args, name) {
   return value;
 }
 
-function parseAllowedPermissions(value) {
+function parseAllowedPermissions(value: string | undefined): CrudPermission[] {
   if (value === undefined) {
     return ["READ"];
   }
-  const supported = new Set(["READ", "CREATE", "UPDATE", "DELETE"]);
+  const supported = new Set<CrudPermission>(["READ", "CREATE", "UPDATE", "DELETE"]);
   const permissions = [...new Set(value.split(",").map((entry) => entry.trim().toUpperCase()))];
-  const invalid = permissions.filter((permission) => !supported.has(permission));
+  const invalid = permissions.filter(
+    (permission) => !supported.has(permission as CrudPermission)
+  );
   if (invalid.length > 0) {
     throw new Error(
       `--allow contains unsupported permission(s): ${invalid.join(", ")}. ` +
       "Use READ, CREATE, UPDATE, or DELETE."
     );
   }
-  return permissions;
+  return permissions as CrudPermission[];
 }
 
-async function readInput(inputPath) {
+async function readInput(inputPath: string): Promise<string> {
   if (inputPath !== "-") {
     return fs.readFileSync(inputPath, "utf8");
   }
@@ -186,6 +205,10 @@ async function readInput(inputPath) {
   return text;
 }
 
-function writeJson(value) {
+function writeJson(value: unknown): void {
   process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
+}
+
+function writeVerboseEvent(event: BacklogAccessEvent): void {
+  process.stderr.write(`${formatBacklogAccessEvent(event)}\n`);
 }

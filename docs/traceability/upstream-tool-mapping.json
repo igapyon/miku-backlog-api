@@ -10,7 +10,7 @@
   "target": {
     "repository": "backlog-api",
     "product": "backlog-api",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "strategy": "published-handler-direct-invocation"
   },
   "operations": [
@@ -20,7 +20,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/addDocument.ts",
       "upstreamTest": "src/tools/addDocument.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "add_issue",
@@ -28,7 +28,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/addIssue.ts",
       "upstreamTest": "src/tools/addIssue.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "add_issue_comment",
@@ -36,7 +36,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/addIssueComment.ts",
       "upstreamTest": "src/tools/addIssueComment.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "add_project",
@@ -44,7 +44,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/addProject.ts",
       "upstreamTest": "src/tools/addProject.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "add_pull_request",
@@ -52,7 +52,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/addPullRequest.ts",
       "upstreamTest": "src/tools/addPullRequest.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "add_pull_request_comment",
@@ -60,7 +60,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/addPullRequestComment.ts",
       "upstreamTest": "src/tools/addPullRequestComment.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "add_version_milestone",
@@ -68,7 +68,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/addVersionMilestone.ts",
       "upstreamTest": "src/tools/addVersionMilestone.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "add_watching",
@@ -76,7 +76,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/addWatching.ts",
       "upstreamTest": "src/tools/addWatching.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "add_wiki",
@@ -84,7 +84,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/addWiki.ts",
       "upstreamTest": "src/tools/addWiki.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "count_issues",
@@ -92,7 +92,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/countIssues.ts",
       "upstreamTest": "src/tools/countIssues.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "count_notifications",
@@ -100,7 +100,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getNotificationsCount.ts",
       "upstreamTest": "src/tools/getNotificationsCount.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "delete_issue",
@@ -108,7 +108,7 @@
       "mutationClass": "destructive",
       "upstreamSource": "src/tools/deleteIssue.ts",
       "upstreamTest": "src/tools/deleteIssue.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "delete_project",
@@ -116,7 +116,7 @@
       "mutationClass": "destructive",
       "upstreamSource": "src/tools/deleteProject.ts",
       "upstreamTest": "src/tools/deleteProject.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "delete_version",
@@ -124,7 +124,7 @@
       "mutationClass": "destructive",
       "upstreamSource": "src/tools/deleteVersion.ts",
       "upstreamTest": "src/tools/deleteVersion.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "delete_watching",
@@ -132,7 +132,7 @@
       "mutationClass": "destructive",
       "upstreamSource": "src/tools/deleteWatching.ts",
       "upstreamTest": "src/tools/deleteWatching.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_categories",
@@ -140,7 +140,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getCategories.ts",
       "upstreamTest": "src/tools/getCategories.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_custom_fields",
@@ -148,7 +148,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getCustomFields.ts",
       "upstreamTest": "src/tools/getCustomFields.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_document",
@@ -156,7 +156,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getDocument.ts",
       "upstreamTest": "src/tools/getDocument.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_document_tree",
@@ -164,7 +164,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getDocumentTree.ts",
       "upstreamTest": "src/tools/getDocumentTree.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_documents",
@@ -172,7 +172,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getDocuments.ts",
       "upstreamTest": "src/tools/getDocuments.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_git_repositories",
@@ -180,7 +180,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getGitRepositories.ts",
       "upstreamTest": "src/tools/getGitRepositories.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_git_repository",
@@ -188,7 +188,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getGitRepository.ts",
       "upstreamTest": "src/tools/getGitRepository.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_issue",
@@ -196,7 +196,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getIssue.ts",
       "upstreamTest": "src/tools/getIssue.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_issue_comments",
@@ -204,7 +204,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getIssueComments.ts",
       "upstreamTest": "src/tools/getIssueComments.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_issue_types",
@@ -212,7 +212,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getIssueTypes.ts",
       "upstreamTest": "src/tools/getIssueTypes.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_issues",
@@ -220,7 +220,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getIssues.ts",
       "upstreamTest": "src/tools/getIssues.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_myself",
@@ -228,7 +228,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getMyself.ts",
       "upstreamTest": "src/tools/getMyself.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_notifications",
@@ -236,7 +236,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getNotifications.ts",
       "upstreamTest": "src/tools/getNotifications.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_priorities",
@@ -244,7 +244,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getPriorities.ts",
       "upstreamTest": "src/tools/getPriorities.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_project",
@@ -252,7 +252,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getProject.ts",
       "upstreamTest": "src/tools/getProject.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_project_list",
@@ -260,7 +260,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getProjectList.ts",
       "upstreamTest": "src/tools/getProjectList.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_project_users",
@@ -268,7 +268,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getProjectUsers.ts",
       "upstreamTest": "src/tools/getProjectUsers.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_pull_request",
@@ -276,7 +276,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getPullRequest.ts",
       "upstreamTest": "src/tools/getPullRequest.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_pull_request_comments",
@@ -284,7 +284,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getPullRequestComments.ts",
       "upstreamTest": "src/tools/getPullRequestComments.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_pull_requests",
@@ -292,7 +292,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getPullRequests.ts",
       "upstreamTest": "src/tools/getPullRequests.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_pull_requests_count",
@@ -300,7 +300,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getPullRequestsCount.ts",
       "upstreamTest": "src/tools/getPullRequestsCount.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_resolutions",
@@ -308,7 +308,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getResolutions.ts",
       "upstreamTest": "src/tools/getResolutions.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_space",
@@ -316,7 +316,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getSpace.ts",
       "upstreamTest": "src/tools/getSpace.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_space_activities",
@@ -324,7 +324,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getSpaceActivities.ts",
       "upstreamTest": "src/tools/getSpaceActivities.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_user_recent_updates",
@@ -332,7 +332,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getUserRecentUpdates.ts",
       "upstreamTest": "src/tools/getUserRecentUpdates.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_user_stars_count",
@@ -340,7 +340,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getUserStarsCount.ts",
       "upstreamTest": "src/tools/getUserStarsCount.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_users",
@@ -348,7 +348,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getUsers.ts",
       "upstreamTest": "src/tools/getUsers.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_version_milestone_list",
@@ -356,7 +356,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getVersionMilestoneList.ts",
       "upstreamTest": "src/tools/getVersionMilestoneList.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_watching_list_count",
@@ -364,7 +364,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getWatchingListCount.ts",
       "upstreamTest": "src/tools/getWatchingListCount.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_watching_list_items",
@@ -372,7 +372,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getWatchingListItems.ts",
       "upstreamTest": "src/tools/getWatchingListItems.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_wiki",
@@ -380,7 +380,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getWiki.ts",
       "upstreamTest": "src/tools/getWiki.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_wiki_pages",
@@ -388,7 +388,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getWikiPages.ts",
       "upstreamTest": "src/tools/getWikiPages.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "get_wikis_count",
@@ -396,7 +396,7 @@
       "mutationClass": "read",
       "upstreamSource": "src/tools/getWikisCount.ts",
       "upstreamTest": "src/tools/getWikisCount.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "mark_notification_as_read",
@@ -404,7 +404,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/markNotificationAsRead.ts",
       "upstreamTest": "src/tools/markNotificationAsRead.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "mark_watching_as_read",
@@ -412,7 +412,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/markWatchingAsRead.ts",
       "upstreamTest": "src/tools/markWatchingAsRead.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "reset_unread_notification_count",
@@ -420,7 +420,7 @@
       "mutationClass": "broad-mutation",
       "upstreamSource": "src/tools/resetUnreadNotificationCount.ts",
       "upstreamTest": "src/tools/resetUnreadNotificationCount.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "update_issue",
@@ -428,7 +428,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/updateIssue.ts",
       "upstreamTest": "src/tools/updateIssue.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "update_project",
@@ -436,7 +436,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/updateProject.ts",
       "upstreamTest": "src/tools/updateProject.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "update_pull_request",
@@ -444,7 +444,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/updatePullRequest.ts",
       "upstreamTest": "src/tools/updatePullRequest.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "update_pull_request_comment",
@@ -452,7 +452,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/updatePullRequestComment.ts",
       "upstreamTest": "src/tools/updatePullRequestComment.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "update_version_milestone",
@@ -460,7 +460,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/updateVersionMilestone.ts",
       "upstreamTest": "src/tools/updateVersionMilestone.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "update_watching",
@@ -468,7 +468,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/updateWatching.ts",
       "upstreamTest": "src/tools/updateWatching.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     },
     {
       "operation": "update_wiki",
@@ -476,7 +476,7 @@
       "mutationClass": "mutation",
       "upstreamSource": "src/tools/updateWiki.ts",
       "upstreamTest": "src/tools/updateWiki.test.ts",
-      "targetEntry": "src/core/run-operation.mjs"
+      "targetEntry": "src/core/run-operation.ts"
     }
   ]
 }

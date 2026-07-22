@@ -8,7 +8,7 @@ handlers.
 > This project is currently in beta. Interfaces and behavior may change before
 > the stable release.
 
-The conversion removes the MCP transport boundary while preserving upstream
+The TypeScript implementation removes the MCP transport boundary while preserving upstream
 tool names, Zod input schemas, handler behavior, Backlog API behavior, and
 source/test traceability. It adds a JSON CLI envelope, dry-run validation, and
 confirmation guards for destructive operations.
@@ -35,10 +35,29 @@ Delete operations and broad notification reset require
 `--confirm-destructive`. Use `--dry-run` to validate input without calling
 Backlog.
 
+Use `--verbose` to write a short event for the start and outcome of each
+Backlog API access to stderr. Events identify the operation, Backlog client
+method, CRUD category, and whether the default or a named organization was
+selected. Request arguments, organization names, credentials, response data,
+and upstream error text are never included. Stdout remains machine-readable
+JSON.
+
 `call` permits `READ` operations by default. Enable other client-side CRUD
 categories explicitly with `--allow CREATE`, `--allow UPDATE`, or
 `--allow DELETE`. Delete operations require both `--allow DELETE` and
 `--confirm-destructive`; these are independent safeguards.
+
+Add a top-level `fields` property to the input JSON to select result fields
+with the upstream GraphQL-style syntax:
+
+```json
+{"issueKey":"PROJ-1","fields":"{ id issueKey summary createdUser { name } }"}
+```
+
+The CLI validates `fields` before invoking Backlog and always preserves its
+JSON result envelope. Upstream token-count truncation is not exposed because
+cutting serialized JSON can produce an invalid or ambiguous result; use
+`fields` to reduce output instead.
 
 ## Requirements and Authentication
 
@@ -84,6 +103,7 @@ artifacts directly.
 
 ```bash
 npm install
+npm run typecheck
 npm run trace:refresh
 npm test
 npm run smoke:node
@@ -94,6 +114,9 @@ Generated outputs include:
 - `bundle/backlog-api.mjs`
 - `bundle/backlog-api-runtime.mjs`
 - `bundle/backlog-api-sources.tgz`
+
+Authoritative application sources are TypeScript files under `src/`. The
+compiled `dist/ts/` tree and bundled `.mjs` files are generated artifacts.
 
 ## Upstream Traceability
 

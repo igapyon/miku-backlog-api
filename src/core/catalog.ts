@@ -1,10 +1,11 @@
 import { allTools } from "backlog-mcp-server/build/tools/tools.js";
+import type { CrudPermission, MutationClass } from "./contracts.js";
 
 const fallbackTranslation = {
-  t(_key, fallback) {
+  t(_key: string, fallback: string): string {
     return fallback;
   },
-  dump() {
+  dump(): Record<string, never> {
     return {};
   }
 };
@@ -19,7 +20,7 @@ const metadataOnlyClient = new Proxy({}, {
   }
 });
 
-export function createToolsets(backlog = metadataOnlyClient) {
+export function createToolsets(backlog: object = metadataOnlyClient) {
   return allTools(backlog, fallbackTranslation).toolsets;
 }
 
@@ -35,7 +36,7 @@ export function listOperations() {
     .sort((left, right) => compareUtf16(left.name, right.name));
 }
 
-export function resolveTool(backlog, operationName) {
+export function resolveTool(backlog: object, operationName: string) {
   for (const toolset of createToolsets(backlog)) {
     const tool = toolset.tools.find((candidate) => candidate.name === operationName);
     if (tool) {
@@ -45,7 +46,7 @@ export function resolveTool(backlog, operationName) {
   return undefined;
 }
 
-export function classifyMutation(operationName) {
+export function classifyMutation(operationName: string): MutationClass {
   if (operationName.startsWith("delete_")) {
     return "destructive";
   }
@@ -63,7 +64,7 @@ export function classifyMutation(operationName) {
   return "read";
 }
 
-export function requiredPermission(operationName) {
+export function requiredPermission(operationName: string): CrudPermission {
   const mutationClass = classifyMutation(operationName);
   if (mutationClass === "read") {
     return "READ";
@@ -77,6 +78,6 @@ export function requiredPermission(operationName) {
   return "UPDATE";
 }
 
-function compareUtf16(left, right) {
+function compareUtf16(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
 }

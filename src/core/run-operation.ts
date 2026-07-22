@@ -1,9 +1,22 @@
 import { parseBacklogAPIError } from "backlog-mcp-server/build/backlog/parseBacklogAPIError.js";
 import { createBacklogClientRegistry } from "backlog-mcp-server/build/utils/backlogClientRegistry.js";
-import { classifyMutation, requiredPermission, resolveTool } from "./catalog.mjs";
-import { getUpstreamTrace } from "./traceability.mjs";
+import { classifyMutation, requiredPermission, resolveTool } from "./catalog.js";
+import type {
+  DiagnosticCode,
+  OperationFailure,
+  OperationResult,
+  RunOperationOptions,
+  UpstreamTrace
+} from "./contracts.js";
+import { selectResultFields, validateFieldsSelection } from "./field-selection.js";
+import { getUpstreamTrace } from "./traceability.js";
+import { observeBacklogClient } from "./verbose-client.js";
 
-export async function runOperation(operation, input, options = {}) {
+export async function runOperation(
+  operation: string,
+  input: unknown,
+  options: RunOperationOptions = {}
+): Promise<OperationResult> {
   const trace = getUpstreamTrace(operation);
   const mutationClass = classifyMutation(operation);
   const permission = requiredPermission(operation);
@@ -24,6 +37,14 @@ export async function runOperation(operation, input, options = {}) {
     return failure(operation, "INVALID_INPUT", "Input must be a JSON object.", trace);
   }
 
+  const request = input as Record<string, unknown>;
+  const fields = request.fields;
+  try {
+    await validateFieldsSelection(fields);
+  } catch (error) {
+    return failure(operation, "INVALID_FIELDS", errorMessage(error), trace);
+  }
+
   if (
     (mutationClass === "destructive" || mutationClass === "broad-mutation") &&
     options.confirmDestructive !== true
@@ -38,12 +59,22 @@ export async function runOperation(operation, input, options = {}) {
 
   let registry;
   try {
-    registry = options.registry ?? createBacklogClientRegistry({ env: options.env });
+    registry = options.registry ?? createBacklogClientRegistry(
+      options.env === undefined ? {} : { env: options.env }
+    );
   } catch (error) {
     return failure(operation, "CONFIGURATION_ERROR", errorMessage(error), trace);
   }
 
-  const { organization, ...toolInput } = input;
+  const { organization, fields: _fields, ...toolInput } = request;
+  if (organization !== undefined && typeof organization !== "string") {
+    return failure(
+      operation,
+      "INVALID_ARGUMENT",
+      "organization must be a string when provided.",
+      trace
+    );
+  }
   let backlog;
   try {
     backlog = registry.resolveClient(organization);
@@ -51,7 +82,13 @@ export async function runOperation(operation, input, options = {}) {
     return failure(operation, "ORGANIZATION_ERROR", errorMessage(error), trace);
   }
 
-  const resolved = resolveTool(backlog, operation);
+  const observedBacklog = observeBacklogClient(backlog, {
+    operation,
+    permission,
+    organization: organization === undefined ? "default" : "named",
+    ...(options.onAccess === undefined ? {} : { onAccess: options.onAccess })
+  });
+  const resolved = resolveTool(observedBacklog, operation);
   if (!resolved) {
     return failure(operation, "UNKNOWN_OPERATION", `Unknown operation: ${operation}`, trace);
   }
@@ -66,7 +103,7 @@ export async function runOperation(operation, input, options = {}) {
       diagnostics: parsed.error.issues.map((issue) => ({
         code: "INVALID_ARGUMENT",
         severity: "error",
-        path: issue.path.join("."),
+        path: issue.path.map(String).join("."),
         message: issue.message
       })),
       trace
@@ -88,12 +125,13 @@ export async function runOperation(operation, input, options = {}) {
 
   try {
     const result = await resolved.tool.handler(parsed.data);
+    const selectedResult = await selectResultFields(result, fields);
     return {
       schemaVersion: 1,
       operation,
       toolset: resolved.toolset,
       success: true,
-      result,
+      result: selectedResult,
       diagnostics: [],
       trace
     };
@@ -109,7 +147,13 @@ export async function runOperation(operation, input, options = {}) {
   }
 }
 
-function failure(operation, code, message, trace, toolset) {
+function failure(
+  operation: string,
+  code: DiagnosticCode,
+  message: string,
+  trace: UpstreamTrace,
+  toolset?: string
+): OperationFailure {
   return {
     schemaVersion: 1,
     operation,
@@ -120,6 +164,6 @@ function failure(operation, code, message, trace, toolset) {
   };
 }
 
-function errorMessage(error) {
+function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
