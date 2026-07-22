@@ -13,7 +13,7 @@ for (const args of [["--version"], ["--help"], ["tools", "list"]]) {
 
 const runtime = await import("../bundle/backlog-api-runtime.mjs");
 assert.equal(runtime.product.name, "backlog-api");
-assert.equal(runtime.product.version, "0.3.3");
+assert.equal(runtime.product.version, "0.3.4");
 assert.equal(runtime.listOperations().length, 58);
 
 process.stdout.write("[smoke:node] CLI metadata and importable runtime passed\n");

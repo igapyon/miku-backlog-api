@@ -39,6 +39,26 @@ export interface BacklogClientRegistry {
 
 export type BacklogAccessPhase = "start" | "success" | "failure";
 
+export interface BacklogResourceIdentifiers {
+  spaceKey?: string;
+  projectId?: number | readonly number[];
+  projectKey?: string;
+  issueId?: number | readonly number[];
+  issueKey?: string;
+  wikiId?: number;
+  repositoryId?: number;
+  repositoryName?: string;
+  pullRequestId?: number;
+  pullRequestNumber?: number;
+  commentId?: number;
+  attachmentId?: number | readonly number[];
+}
+
+export interface BacklogPaginationMetadata {
+  offset?: number;
+  count?: number;
+}
+
 export interface BacklogAccessEvent {
   phase: BacklogAccessPhase;
   access: number;
@@ -46,6 +66,12 @@ export interface BacklogAccessEvent {
   method: string;
   permission: CrudPermission;
   organization: "default" | "named";
+  target?: BacklogResourceIdentifiers;
+  result?: BacklogResourceIdentifiers;
+  changedFields?: readonly string[];
+  pagination?: BacklogPaginationMetadata;
+  durationMs?: number;
+  httpStatus?: number;
 }
 
 export interface RunOperationOptions {

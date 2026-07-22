@@ -82,12 +82,17 @@ export async function runOperation(
     return failure(operation, "ORGANIZATION_ERROR", errorMessage(error), trace);
   }
 
-  const observedBacklog = observeBacklogClient(backlog, {
+  const organizationClass: "default" | "named" = organization === undefined
+    ? "default"
+    : "named";
+  const verboseContext = {
     operation,
     permission,
-    organization: organization === undefined ? "default" : "named",
+    organization: organizationClass,
+    input: {} as Record<string, unknown>,
     ...(options.onAccess === undefined ? {} : { onAccess: options.onAccess })
-  });
+  };
+  const observedBacklog = observeBacklogClient(backlog, verboseContext);
   const resolved = resolveTool(observedBacklog, operation);
   if (!resolved) {
     return failure(operation, "UNKNOWN_OPERATION", `Unknown operation: ${operation}`, trace);
@@ -108,6 +113,9 @@ export async function runOperation(
       })),
       trace
     };
+  }
+  if (isRecord(parsed.data)) {
+    verboseContext.input = parsed.data;
   }
 
   if (options.dryRun === true) {
@@ -166,4 +174,8 @@ function failure(
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

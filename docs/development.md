@@ -3,7 +3,7 @@
 ## Initial Design Record
 
 - checked date: 2026-07-22
-- repository version: `0.3.3`
+- repository version: `0.3.4`
 - implementation maturity: beta standalone Node Core/CLI
 - split source: `backlog-api-skills` initial combined implementation
 
@@ -52,8 +52,11 @@ cross-product integrations.
 - generate and commit an upstream tool mapping
 - bundle CLI and importable runtime artifacts separately
 - require a CLI-level confirmation flag for destructive and broad-reset calls
-- keep API access summaries opt-in with `--verbose`, on stderr, without request,
-  response, credential, organization-name, or error-message data
+- keep API access summaries opt-in with `--verbose` and emit structured JSON on
+  stderr
+- expose only whitelisted resource identifiers and execution metadata; omit
+  content values, full requests/responses, credentials, organization names,
+  personal data, and error messages
 - keep the upstream checkout under ignored `workplace/upstream/`
 
 ## Commands

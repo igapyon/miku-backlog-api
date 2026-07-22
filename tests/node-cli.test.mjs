@@ -7,7 +7,7 @@ const CLI = "bundle/backlog-api.mjs";
 test("CLI metadata commands do not require credentials", () => {
   const version = run(["--version"]);
   assert.equal(version.status, 0);
-  assert.equal(version.stdout, "0.3.3\n");
+  assert.equal(version.stdout, "0.3.4\n");
   assert.equal(version.stderr, "");
 
   const help = run(["--help"]);
@@ -17,6 +17,8 @@ test("CLI metadata commands do not require credentials", () => {
   assert.match(help.stdout, /machine-readable JSON to stdout/);
   assert.match(help.stdout, /--confirm-destructive/);
   assert.match(help.stdout, /--verbose/);
+  assert.match(help.stdout, /resource IDs\/keys/);
+  assert.match(help.stdout, /under target/);
   assert.match(help.stdout, /Exit codes:/);
 
   const catalog = JSON.parse(run(["tools", "list"]).stdout);
