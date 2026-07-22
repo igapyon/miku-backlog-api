@@ -38,9 +38,19 @@ Backlog.
 Use `--verbose` to write a short event for the start and outcome of each
 Backlog API access to stderr. Events identify the operation, Backlog client
 method, CRUD category, and whether the default or a named organization was
-selected. Request arguments, organization names, credentials, response data,
-and upstream error text are never included. Stdout remains machine-readable
-JSON.
+selected. A strict whitelist also exposes resource identifiers such as
+`spaceKey`, `projectId`, and `issueKey`, IDs returned by successful API
+operations, duration, changed field names without values, pagination, and an
+HTTP failure status when the upstream error exposes one.
+
+Each line starts with `verbose: ` followed by a JSON object. Request and
+response bodies, summaries, descriptions, comments, search terms, organization
+names, credentials, personal data, and upstream error text are never included.
+Stdout remains machine-readable JSON.
+
+```text
+verbose: {"type":"backlog-api-access","phase":"success","access":1,"operation":"get_issue","method":"getIssue","permission":"READ","organization":"default","target":{"issueKey":"PROJ-1"},"result":{"issueId":123,"issueKey":"PROJ-1"},"durationMs":184.2}
+```
 
 `call` permits `READ` operations by default. Enable other client-side CRUD
 categories explicitly with `--allow CREATE`, `--allow UPDATE`, or

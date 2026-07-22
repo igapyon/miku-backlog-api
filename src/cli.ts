@@ -49,7 +49,11 @@ Call options:
   --dry-run               Validate and normalize input without invoking Backlog.
   --confirm-destructive   Explicitly authorize delete_* or broad reset calls.
   --verbose               Write a safe summary of each Backlog API access to
-                          stderr. Arguments, credentials, and results are omitted.
+                          stderr as a "verbose: " prefixed JSON object. A
+                          whitelist may include resource IDs/keys, duration,
+                          changed field names, pagination, and an exposed HTTP
+                          failure status. Content values, credentials, personal
+                          data, full arguments/results, and error text are omitted.
 
 Input JSON:
   The input must be exactly one JSON object. Operation arguments are top-level
@@ -63,7 +67,9 @@ Output:
   A call result contains schemaVersion, operation, success, diagnostics,
   trace, and either result or dryRun/input data. --help and --version are the
   only plain-text stdout commands. Unexpected CLI errors are written to stderr.
-  --verbose adds "verbose:" access events to stderr without changing stdout.
+  --verbose adds "verbose:" JSON access events to stderr without changing
+  stdout. Start and outcome events share the same access number. Safe input
+  identifiers appear under target; IDs returned on success appear under result.
 
 Safety:
   Calls allow READ operations only by default. CREATE, UPDATE, and DELETE must

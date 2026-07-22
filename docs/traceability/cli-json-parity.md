@@ -48,9 +48,11 @@ use the same envelope with `success: false` and error diagnostics.
   `UPDATE`, or `DELETE`
 - destructive and broad-reset operations require
   `--confirm-destructive`
-- `--verbose` writes sanitized Backlog access start/outcome events to stderr;
-  request arguments, organization names, credentials, responses, and upstream
-  error text are omitted
+- `--verbose` writes sanitized Backlog access start/outcome JSON events to
+  stderr; a whitelist permits resource identifiers, duration, changed field
+  names, pagination, and an exposed HTTP failure status
+- content values, full request/response data, organization names, credentials,
+  personal data, and upstream error text are omitted from verbose events
 
 Stdout is reserved for metadata or result JSON except `--help` and `--version`.
 Unexpected CLI failures go to stderr.
