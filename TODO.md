@@ -17,22 +17,10 @@
       to the `backlog-api-skills` runtime checksum and workflow references.
 - [ ] Confirm that CI and release workflows pass independently in both
       repositories and that the Node release contains no Agent Skill files.
-- [ ] Register the Node-specific GitHub Issues using the Japanese drafts in
-      `docs/github-issue-drafts.md`.
+- [x] Register the Node-specific GitHub Issues as
+      [Issues #2–#7](https://github.com/igapyon/backlog-api/issues).
 
 ## Node Compatibility and Maintenance
 
-- [ ] Add differential tests that invoke representative upstream MCP-composed
-      handlers and converted Node operations with the same mocked Backlog
-      responses.
-- [ ] Decide whether to add CLI parity for upstream GraphQL-style `fields`
-      selection and token limiting.
-- [ ] Decide whether organization discovery should become a tracked Node
-      meta-operation.
-- [ ] Reduce the install-time dependency tree so unused MCP SDK and HTTP
-      dependencies from the published upstream package are not installed. The
-      generated runtime currently excludes them and tests verify that boundary.
-- [ ] Validate a read-only operation against a real Backlog environment without
-      storing credentials or tenant data.
-- [ ] Recheck and regenerate all mappings when intentionally moving beyond
-      upstream `v0.13.2`.
+Node compatibility and maintenance work is tracked in
+[GitHub Issues #2–#7](https://github.com/igapyon/backlog-api/issues).

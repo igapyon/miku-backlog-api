@@ -41,6 +41,32 @@ Backlog.
 Credentials are inherited from the execution environment. They are not stored,
 printed, or bundled by this repository.
 
+### Local Connection Configuration
+
+When a local Backlog connection file is explicitly requested, create
+`workplace/backlog.env` with this template and replace the example domain:
+
+```dotenv
+BACKLOG_DOMAIN=userunique.backlog.com
+BACKLOG_API_KEY=
+```
+
+Apply the following safety rules:
+
+- create the file only after an explicit request
+- set its permissions to `600`
+- never overwrite an existing file
+- never print or copy its values into chat, logs, tracked files, or generated
+  artifacts
+- specify `BACKLOG_DOMAIN` as a host name only, without `https://` or a trailing
+  slash
+- confirm that the file remains ignored by Git under `workplace/`
+- begin a connection test with a read-only operation such as `get_space`
+
+The CLI does not automatically load this file. A local operator or Agent
+workflow must load its values into the process environment immediately before
+invoking the CLI.
+
 ## Build and Test
 
 Dependency lifecycle scripts are disabled because the pinned upstream package
@@ -73,8 +99,8 @@ npm run trace:refresh
 See [`docs/traceability/`](docs/traceability/) for the upstream source, test,
 operation, and compatibility records.
 
-Node-specific GitHub Issue drafts are collected in
-[`docs/github-issue-drafts.md`](docs/github-issue-drafts.md).
+Node-specific planned work is tracked in
+[GitHub Issues](https://github.com/igapyon/backlog-api/issues).
 
 The sister Skill repository pins a released `backlog-api` runtime and records
 the Node version and artifact identity separately.
