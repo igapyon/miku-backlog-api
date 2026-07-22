@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { classifyMutation, listOperations } from "../src/core/catalog.mjs";
+import {
+  classifyMutation,
+  listOperations,
+  requiredPermission
+} from "../src/core/catalog.mjs";
 import { runOperation } from "../src/core/run-operation.mjs";
 
 const ROOT = process.cwd();
@@ -40,6 +44,26 @@ test("mutation classification preserves unusual upstream names", () => {
   assert.equal(classifyMutation("addDocument"), "mutation");
   assert.equal(classifyMutation("delete_project"), "destructive");
   assert.equal(classifyMutation("reset_unread_notification_count"), "broad-mutation");
+  assert.equal(requiredPermission("get_issue"), "READ");
+  assert.equal(requiredPermission("addDocument"), "CREATE");
+  assert.equal(requiredPermission("mark_notification_as_read"), "UPDATE");
+  assert.equal(requiredPermission("reset_unread_notification_count"), "UPDATE");
+  assert.equal(requiredPermission("delete_project"), "DELETE");
+});
+
+test("permission policy rejects operations before client resolution", async () => {
+  const registry = {
+    resolveClient() {
+      throw new Error("must not resolve");
+    }
+  };
+  const result = await runOperation("update_issue", {}, {
+    registry,
+    allowedPermissions: ["READ"]
+  });
+
+  assert.equal(result.success, false);
+  assert.equal(result.diagnostics[0].code, "PERMISSION_REQUIRED");
 });
 
 test("get_issue validates and invokes the original upstream handler", async () => {

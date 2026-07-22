@@ -3,9 +3,18 @@
 ## Initial Design Record
 
 - checked date: 2026-07-22
-- repository version: `0.3.1`
-- implementation maturity: standalone Node Core/CLI
+- repository version: `0.3.2`
+- implementation maturity: beta standalone Node Core/CLI
 - split source: `backlog-api-skills` initial combined implementation
+
+## miku-soft Maintenance Reference
+
+- checked date: 2026-07-22
+- skill: `igapyon-miku-soft-developer`
+- reference branch: `igapyon-agent-skills` `devel`
+- remote reference commit: `ffb31ce3740919ea9e0905a72d89308299f5c021`
+- workflow: maintenance mode with the Node App workflow
+- architecture reference: `miku-soft-10-mainapp-design.md`
 
 ## Upstream Anchor
 
