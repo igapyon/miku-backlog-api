@@ -1,0 +1,82 @@
+name: Build And Upload Release Assets
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "GitHub Release tag to attach Node artifacts to"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.release.tag_name || github.event.inputs.tag_name, 'v')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.tag_name || github.event.release.tag_name || github.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and test
+        run: npm run build
+
+      - name: Verify runtime artifacts
+        run: |
+          set -euo pipefail
+          test -s bundle/backlog-api.mjs
+          test -s bundle/backlog-api-runtime.mjs
+          test -s bundle/backlog-api-sources.tgz
+          npm run smoke:node
+
+      - name: Verify release tag version
+        id: release_version
+        shell: bash
+        env:
+          TAG_NAME: ${{ github.event.inputs.tag_name || github.event.release.tag_name || github.ref_name }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG_NAME#v}"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          case "${VERSION}" in
+            "${PACKAGE_VERSION}"|"${PACKAGE_VERSION}".*) ;;
+            *)
+              echo "Release tag version (${VERSION}) must match package.json version (${PACKAGE_VERSION}) or add a dot suffix such as ${PACKAGE_VERSION}.2." >&2
+              exit 1
+              ;;
+          esac
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          cp bundle/backlog-api.mjs "release-assets/backlog-api-${{ steps.release_version.outputs.version }}.mjs"
+          cp bundle/backlog-api-runtime.mjs "release-assets/backlog-api-runtime-${{ steps.release_version.outputs.version }}.mjs"
+          cp bundle/backlog-api-sources.tgz "release-assets/backlog-api-sources-${{ steps.release_version.outputs.version }}.tgz"
+          cd release-assets
+          sha256sum * > SHA256SUMS
+
+      - name: Upload assets to GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.event.inputs.tag_name || github.event.release.tag_name || github.ref_name }}
+          files: release-assets/*
+          draft: false
+          prerelease: false

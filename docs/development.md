@@ -1,0 +1,55 @@
+# Development
+
+## Initial Design Record
+
+- checked date: 2026-07-22
+- repository version: `0.3.0`
+- implementation maturity: standalone Node Core/CLI
+- split source: `backlog-api-skills` initial combined implementation
+
+## Upstream Anchor
+
+- repository: <https://github.com/nulab/backlog-mcp-server>
+- compatibility version: `v0.13.2`
+- checked commit: `d12f010de976af11bcd43f1d3497dc7043d26e62`
+- npm package: `backlog-mcp-server@0.13.2`
+- upstream license: MIT
+- disposable checkout: `workplace/upstream/backlog-mcp-server`
+
+The runtime imports the published handler modules, validates their original
+Zod schemas, and invokes their handlers directly. MCP stdio/HTTP transport,
+resources, prompts, OAuth HTTP middleware, and dynamic toolset registration are
+not part of this Node CLI runtime.
+
+## Repository Boundary
+
+This repository owns:
+
+- Node Core/CLI source and operation catalog
+- direct upstream handler invocation
+- JSON envelopes and CLI exit behavior
+- dry-run and destructive-operation guards
+- upstream source, test, and operation traceability
+- Node build, tests, runtime artifacts, and releases
+
+The sister `backlog-api-skills` repository owns Agent Skill activation,
+user-facing authorization policy, working context, workflow guidance, and
+cross-product integrations.
+
+## Adopted Decisions
+
+- preserve every upstream normal tool name as one Node operation
+- use one generic, tested operation runner instead of duplicating 58 handlers
+- generate and commit an upstream tool mapping
+- bundle CLI and importable runtime artifacts separately
+- require a CLI-level confirmation flag for destructive and broad-reset calls
+- keep the upstream checkout under ignored `workplace/upstream/`
+
+## Commands
+
+```bash
+npm install
+npm run trace:refresh
+npm test
+npm run smoke:node
+```
