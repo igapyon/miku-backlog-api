@@ -3,7 +3,7 @@
 ## Initial Design Record
 
 - checked date: 2026-07-22
-- repository version: `0.3.2`
+- repository version: `0.3.3`
 - implementation maturity: beta standalone Node Core/CLI
 - split source: `backlog-api-skills` initial combined implementation
 
@@ -34,7 +34,7 @@ not part of this Node CLI runtime.
 
 This repository owns:
 
-- Node Core/CLI source and operation catalog
+- TypeScript Node Core/CLI source and operation catalog
 - direct upstream handler invocation
 - JSON envelopes and CLI exit behavior
 - dry-run and destructive-operation guards
@@ -52,13 +52,21 @@ cross-product integrations.
 - generate and commit an upstream tool mapping
 - bundle CLI and importable runtime artifacts separately
 - require a CLI-level confirmation flag for destructive and broad-reset calls
+- keep API access summaries opt-in with `--verbose`, on stderr, without request,
+  response, credential, organization-name, or error-message data
 - keep the upstream checkout under ignored `workplace/upstream/`
 
 ## Commands
 
 ```bash
 npm install
+npm run typecheck
 npm run trace:refresh
 npm test
 npm run smoke:node
 ```
+
+Application source lives under `src/` as TypeScript. `npm run build:ts`
+compiles it to `dist/ts/`; esbuild then creates the distributable `.mjs`
+bundles. Tests remain Node ESM JavaScript and exercise the compiled source and
+bundles.

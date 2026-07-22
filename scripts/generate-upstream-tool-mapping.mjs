@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { listOperations } from "../src/core/catalog.mjs";
+import { listOperations } from "../dist/ts/core/catalog.js";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(scriptDir, "..");
@@ -45,7 +45,7 @@ const operations = listOperations().map((operation) => {
     upstreamTest: fs.existsSync(path.resolve(upstreamRoot, upstreamTest))
       ? upstreamTest
       : null,
-    targetEntry: "src/core/run-operation.mjs"
+    targetEntry: "src/core/run-operation.ts"
   };
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "backlog-api",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "private": true,
   "type": "module",
   "bin": {
@@ -10,16 +10,20 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "npm run build:node && node --test --test-concurrency=1 tests/*.test.mjs",
+    "test": "npm run build:ts && npm run build:node && node --test --test-concurrency=1 tests/*.test.mjs",
     "build": "npm test",
+    "build:ts": "node scripts/build-typescript.mjs",
     "build:node": "node scripts/build-node.mjs",
+    "typecheck": "tsc --noEmit",
     "smoke:node": "node scripts/smoke-node.mjs",
-    "trace:refresh": "node scripts/generate-upstream-tool-mapping.mjs"
+    "trace:refresh": "npm run build:ts && node scripts/generate-upstream-tool-mapping.mjs"
   },
   "dependencies": {
     "backlog-mcp-server": "0.13.2"
   },
   "devDependencies": {
-    "esbuild": "0.28.1"
+    "@types/node": "26.1.1",
+    "esbuild": "0.28.1",
+    "typescript": "7.0.2"
   }
 }
