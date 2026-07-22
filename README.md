@@ -4,6 +4,10 @@
 [Nulab Backlog MCP Server](https://github.com/nulab/backlog-mcp-server) tool
 handlers.
 
+> [!IMPORTANT]
+> This project is currently in beta. Interfaces and behavior may change before
+> the stable release.
+
 The conversion removes the MCP transport boundary while preserving upstream
 tool names, Zod input schemas, handler behavior, Backlog API behavior, and
 source/test traceability. It adds a JSON CLI envelope, dry-run validation, and
@@ -30,6 +34,11 @@ envelope containing the result, diagnostics, and upstream trace information.
 Delete operations and broad notification reset require
 `--confirm-destructive`. Use `--dry-run` to validate input without calling
 Backlog.
+
+`call` permits `READ` operations by default. Enable other client-side CRUD
+categories explicitly with `--allow CREATE`, `--allow UPDATE`, or
+`--allow DELETE`. Delete operations require both `--allow DELETE` and
+`--confirm-destructive`; these are independent safeguards.
 
 ## Requirements and Authentication
 

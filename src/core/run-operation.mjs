@@ -1,11 +1,24 @@
 import { parseBacklogAPIError } from "backlog-mcp-server/build/backlog/parseBacklogAPIError.js";
 import { createBacklogClientRegistry } from "backlog-mcp-server/build/utils/backlogClientRegistry.js";
-import { classifyMutation, resolveTool } from "./catalog.mjs";
+import { classifyMutation, requiredPermission, resolveTool } from "./catalog.mjs";
 import { getUpstreamTrace } from "./traceability.mjs";
 
 export async function runOperation(operation, input, options = {}) {
   const trace = getUpstreamTrace(operation);
   const mutationClass = classifyMutation(operation);
+  const permission = requiredPermission(operation);
+
+  if (
+    options.allowedPermissions !== undefined &&
+    !options.allowedPermissions.includes(permission)
+  ) {
+    return failure(
+      operation,
+      "PERMISSION_REQUIRED",
+      `Operation ${operation} requires ${permission} permission. Add it with --allow ${permission}.`,
+      trace
+    );
+  }
 
   if (!input || typeof input !== "object" || Array.isArray(input)) {
     return failure(operation, "INVALID_INPUT", "Input must be a JSON object.", trace);

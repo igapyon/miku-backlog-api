@@ -41,6 +41,8 @@ use the same envelope with `success: false` and error diagnostics.
 - no GraphQL-style field selection in the initial CLI
 - no MCP token-count truncation in the initial CLI
 - CLI trace metadata is added
+- CLI calls allow `READ` by default and require `--allow` for `CREATE`,
+  `UPDATE`, or `DELETE`
 - destructive and broad-reset operations require
   `--confirm-destructive`
 

@@ -29,7 +29,8 @@ export function listOperations() {
       name: tool.name,
       description: tool.description,
       toolset: toolset.name,
-      mutationClass: classifyMutation(tool.name)
+      mutationClass: classifyMutation(tool.name),
+      requiredPermission: requiredPermission(tool.name)
     })))
     .sort((left, right) => compareUtf16(left.name, right.name));
 }
@@ -60,6 +61,20 @@ export function classifyMutation(operationName) {
     return "mutation";
   }
   return "read";
+}
+
+export function requiredPermission(operationName) {
+  const mutationClass = classifyMutation(operationName);
+  if (mutationClass === "read") {
+    return "READ";
+  }
+  if (mutationClass === "destructive") {
+    return "DELETE";
+  }
+  if (operationName.startsWith("add_") || operationName === "addDocument") {
+    return "CREATE";
+  }
+  return "UPDATE";
 }
 
 function compareUtf16(left, right) {
