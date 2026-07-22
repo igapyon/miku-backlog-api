@@ -5,7 +5,7 @@ import test from "node:test";
 const CLI = "bundle/backlog-api.mjs";
 
 test("CLI metadata commands do not require credentials", () => {
-  assert.equal(run(["--version"]).stdout.trim(), "0.3.0");
+  assert.equal(run(["--version"]).stdout.trim(), "0.3.1");
   assert.match(run(["--help"]).stdout, /backlog-api call <operation>/);
 
   const catalog = JSON.parse(run(["tools", "list"]).stdout);
