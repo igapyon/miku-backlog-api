@@ -1,0 +1,85 @@
+# backlog-api
+
+`backlog-api` is a Node Core/CLI straight conversion of the published
+[Nulab Backlog MCP Server](https://github.com/nulab/backlog-mcp-server) tool
+handlers.
+
+The conversion removes the MCP transport boundary while preserving upstream
+tool names, Zod input schemas, handler behavior, Backlog API behavior, and
+source/test traceability. It adds a JSON CLI envelope, dry-run validation, and
+confirmation guards for destructive operations.
+
+Agent workflows, working context, user-facing authorization policy, and
+integrations belong to the sister
+[`backlog-api-skills`](https://github.com/igapyon/backlog-api-skills)
+repository.
+
+## Node CLI
+
+```bash
+node bundle/backlog-api.mjs --version
+node bundle/backlog-api.mjs tools list
+node bundle/backlog-api.mjs trace get_issue
+node bundle/backlog-api.mjs call get_issue --input request.json
+```
+
+The CLI supports all 58 normal tools registered by the checked upstream
+`v0.13.2` source. `call` reads one JSON object and writes one structured JSON
+envelope containing the result, diagnostics, and upstream trace information.
+
+Delete operations and broad notification reset require
+`--confirm-destructive`. Use `--dry-run` to validate input without calling
+Backlog.
+
+## Requirements and Authentication
+
+- Node.js 22 or later
+- a Backlog account with API access
+- `BACKLOG_DOMAIN` and `BACKLOG_API_KEY`, or the upstream multi-organization
+  environment variables
+
+Credentials are inherited from the execution environment. They are not stored,
+printed, or bundled by this repository.
+
+## Build and Test
+
+Dependency lifecycle scripts are disabled because the pinned upstream package
+enforces pnpm even though this project consumes its published `build/`
+artifacts directly.
+
+```bash
+npm install
+npm run trace:refresh
+npm test
+npm run smoke:node
+```
+
+Generated outputs include:
+
+- `bundle/backlog-api.mjs`
+- `bundle/backlog-api-runtime.mjs`
+- `bundle/backlog-api-sources.tgz`
+
+## Upstream Traceability
+
+The disposable upstream checkout belongs under
+`workplace/upstream/backlog-mcp-server`. Refresh the generated mapping after
+intentionally updating that checkout and the pinned package:
+
+```bash
+npm run trace:refresh
+```
+
+See [`docs/traceability/`](docs/traceability/) for the upstream source, test,
+operation, and compatibility records.
+
+Node-specific GitHub Issue drafts are collected in
+[`docs/github-issue-drafts.md`](docs/github-issue-drafts.md).
+
+The sister Skill repository pins a released `backlog-api` runtime and records
+the Node version and artifact identity separately.
+
+## License
+
+This project is MIT licensed. The bundled upstream handler code is also MIT
+licensed; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

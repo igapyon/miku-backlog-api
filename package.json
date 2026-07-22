@@ -1,0 +1,25 @@
+{
+  "name": "backlog-api",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "backlog-api": "dist/cli.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "npm run build:node && node --test --test-concurrency=1 tests/*.test.mjs",
+    "build": "npm test",
+    "build:node": "node scripts/build-node.mjs",
+    "smoke:node": "node scripts/smoke-node.mjs",
+    "trace:refresh": "node scripts/generate-upstream-tool-mapping.mjs"
+  },
+  "dependencies": {
+    "backlog-mcp-server": "0.13.2"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.1"
+  }
+}
