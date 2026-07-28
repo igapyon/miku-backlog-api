@@ -93,6 +93,7 @@ test("representative CRUD operations match upstream composed MCP handlers", asyn
             return nodeBacklog;
           }
         },
+        env: { BACKLOG_API_ALLOWED_PERMISSIONS: fixture.permission },
         allowedPermissions: [fixture.permission],
         confirmDestructive: fixture.permission === "DELETE"
       });

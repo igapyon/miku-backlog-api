@@ -46,13 +46,17 @@ use the same envelope with `success: false` and error diagnostics.
 - CLI trace metadata is added
 - CLI calls allow `READ` by default and require `--allow` for `CREATE`,
   `UPDATE`, or `DELETE`
+- `BACKLOG_API_ALLOWED_PERMISSIONS` defaults to `READ` and limits the maximum
+  call-level CRUD permissions
 - destructive and broad-reset operations require
   `--confirm-destructive`
 - `--verbose` writes sanitized Backlog access start/outcome JSON events to
   stderr; a whitelist permits resource identifiers, duration, changed field
-  names, pagination, and an exposed HTTP failure status
+  names, pagination, actual response status, and validated rate-limit metadata
 - content values, full request/response data, organization names, credentials,
-  personal data, and upstream error text are omitted from verbose events
+personal data, and upstream error text are omitted from verbose events
+- `get_rate_limit` is a Node-specific READ operation, not an upstream normal
+  tool
 
 Stdout is reserved for metadata or result JSON except `--help` and `--version`.
 Unexpected CLI failures go to stderr.

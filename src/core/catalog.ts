@@ -1,5 +1,6 @@
 import { allTools } from "backlog-mcp-server/build/tools/tools.js";
 import type { CrudPermission, MutationClass } from "./contracts.js";
+import { createLocalToolset } from "./local-tools.js";
 
 const fallbackTranslation = {
   t(_key: string, fallback: string): string {
@@ -21,7 +22,10 @@ const metadataOnlyClient = new Proxy({}, {
 });
 
 export function createToolsets(backlog: object = metadataOnlyClient) {
-  return allTools(backlog, fallbackTranslation).toolsets;
+  return [
+    ...allTools(backlog, fallbackTranslation).toolsets,
+    createLocalToolset(backlog)
+  ];
 }
 
 export function listOperations() {

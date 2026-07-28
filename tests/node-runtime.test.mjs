@@ -20,9 +20,15 @@ test("all upstream operations have deterministic source and test mappings", () =
   const runtimeNames = listOperations().map((entry) => entry.name);
   const mappedNames = mapping.operations.map((entry) => entry.operation);
 
-  assert.equal(runtimeNames.length, 58);
+  assert.equal(runtimeNames.length, 59);
   assert.deepEqual(mappedNames, runtimeNames);
-  for (const entry of mapping.operations) {
+  const upstreamEntries = mapping.operations.filter((entry) => entry.origin === "upstream");
+  const localEntries = mapping.operations.filter((entry) => entry.origin === "backlog-api");
+  assert.equal(upstreamEntries.length, 58);
+  assert.deepEqual(localEntries.map((entry) => entry.operation), ["get_rate_limit"]);
+  assert.equal(localEntries[0].upstreamSource, null);
+  assert.equal(localEntries[0].targetEntry, "src/core/local-tools.ts");
+  for (const entry of upstreamEntries) {
     assert.match(entry.upstreamSource, /^src\/tools\/.+\.ts$/);
     assert.match(entry.upstreamTest, /^src\/tools\/.+\.test\.ts$/);
     assert.equal(entry.targetEntry, "src/core/run-operation.ts");
@@ -61,6 +67,7 @@ test("permission policy rejects operations before client resolution", async () =
   };
   const result = await runOperation("update_issue", {}, {
     registry,
+    env: { BACKLOG_API_ALLOWED_PERMISSIONS: "UPDATE" },
     allowedPermissions: ["READ"]
   });
 
@@ -171,7 +178,10 @@ test("verbose metadata safely covers representative CRUD operations", async (t) 
       name: "READ",
       operation: "get_issue",
       input: { issueKey: "SAFE-1" },
-      options: { allowedPermissions: ["READ"] },
+      options: {
+        env: { BACKLOG_API_ALLOWED_PERMISSIONS: "READ" },
+        allowedPermissions: ["READ"]
+      },
       method: "getIssue",
       response: { id: 101, issueKey: "SAFE-1", summary: "SECRET READ RESULT" },
       target: { issueKey: "SAFE-1" },
@@ -187,7 +197,10 @@ test("verbose metadata safely covers representative CRUD operations", async (t) 
         issueTypeId: 20,
         priorityId: 30
       },
-      options: { allowedPermissions: ["CREATE"] },
+      options: {
+        env: { BACKLOG_API_ALLOWED_PERMISSIONS: "CREATE" },
+        allowedPermissions: ["CREATE"]
+      },
       method: "postIssue",
       response: { id: 102, issueKey: "SAFE-2", summary: "SECRET CREATE RESULT" },
       target: { projectId: 10 },
@@ -203,7 +216,10 @@ test("verbose metadata safely covers representative CRUD operations", async (t) 
         statusId: 4,
         secretUnknown: "SECRET UNKNOWN FIELD"
       },
-      options: { allowedPermissions: ["UPDATE"] },
+      options: {
+        env: { BACKLOG_API_ALLOWED_PERMISSIONS: "UPDATE" },
+        allowedPermissions: ["UPDATE"]
+      },
       method: "patchIssue",
       response: { id: 103, issueKey: "SAFE-3", summary: "SECRET UPDATE RESULT" },
       target: { issueKey: "SAFE-3" },
@@ -214,7 +230,11 @@ test("verbose metadata safely covers representative CRUD operations", async (t) 
       name: "DELETE",
       operation: "delete_issue",
       input: { issueKey: "SAFE-4" },
-      options: { allowedPermissions: ["DELETE"], confirmDestructive: true },
+      options: {
+        env: { BACKLOG_API_ALLOWED_PERMISSIONS: "DELETE" },
+        allowedPermissions: ["DELETE"],
+        confirmDestructive: true
+      },
       method: "deleteIssue",
       response: { id: 104, issueKey: "SAFE-4", summary: "SECRET DELETE RESULT" },
       target: { issueKey: "SAFE-4" },
@@ -339,7 +359,11 @@ test("invalid fields prevents a mutation before client resolution", async () => 
       priorityId: 30,
       fields: "id summary"
     },
-    { registry, allowedPermissions: ["CREATE"] }
+    {
+      registry,
+      env: { BACKLOG_API_ALLOWED_PERMISSIONS: "CREATE" },
+      allowedPermissions: ["CREATE"]
+    }
   );
 
   assert.equal(result.success, false);
@@ -352,7 +376,11 @@ test("required input schema errors return diagnostics without invoking Backlog",
       return {};
     }
   };
-  const result = await runOperation("add_issue", {}, { registry });
+  const result = await runOperation("add_issue", {}, {
+    registry,
+    env: { BACKLOG_API_ALLOWED_PERMISSIONS: "CREATE" },
+    allowedPermissions: ["CREATE"]
+  });
 
   assert.equal(result.success, false);
   assert.equal(result.diagnostics[0].code, "INVALID_ARGUMENT");
@@ -364,7 +392,11 @@ test("destructive operations require confirmation before client resolution", asy
       throw new Error("must not resolve");
     }
   };
-  const result = await runOperation("delete_issue", { issueKey: "TEST-1" }, { registry });
+  const result = await runOperation("delete_issue", { issueKey: "TEST-1" }, {
+    registry,
+    env: { BACKLOG_API_ALLOWED_PERMISSIONS: "DELETE" },
+    allowedPermissions: ["DELETE"]
+  });
 
   assert.equal(result.success, false);
   assert.equal(result.diagnostics[0].code, "CONFIRMATION_REQUIRED");

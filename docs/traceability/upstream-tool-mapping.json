@@ -10,7 +10,7 @@
   "target": {
     "repository": "backlog-api",
     "product": "backlog-api",
-    "version": "0.3.4",
+    "version": "0.4.0",
     "strategy": "published-handler-direct-invocation"
   },
   "operations": [
@@ -18,465 +18,591 @@
       "operation": "addDocument",
       "toolset": "document",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/addDocument.ts",
       "upstreamTest": "src/tools/addDocument.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "add_issue",
       "toolset": "issue",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/addIssue.ts",
       "upstreamTest": "src/tools/addIssue.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "add_issue_comment",
       "toolset": "issue",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/addIssueComment.ts",
       "upstreamTest": "src/tools/addIssueComment.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "add_project",
       "toolset": "project",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/addProject.ts",
       "upstreamTest": "src/tools/addProject.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "add_pull_request",
       "toolset": "git",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/addPullRequest.ts",
       "upstreamTest": "src/tools/addPullRequest.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "add_pull_request_comment",
       "toolset": "git",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/addPullRequestComment.ts",
       "upstreamTest": "src/tools/addPullRequestComment.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "add_version_milestone",
       "toolset": "issue",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/addVersionMilestone.ts",
       "upstreamTest": "src/tools/addVersionMilestone.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "add_watching",
       "toolset": "issue",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/addWatching.ts",
       "upstreamTest": "src/tools/addWatching.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "add_wiki",
       "toolset": "wiki",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/addWiki.ts",
       "upstreamTest": "src/tools/addWiki.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "count_issues",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/countIssues.ts",
       "upstreamTest": "src/tools/countIssues.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "count_notifications",
       "toolset": "notifications",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getNotificationsCount.ts",
       "upstreamTest": "src/tools/getNotificationsCount.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "delete_issue",
       "toolset": "issue",
       "mutationClass": "destructive",
+      "origin": "upstream",
       "upstreamSource": "src/tools/deleteIssue.ts",
       "upstreamTest": "src/tools/deleteIssue.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "delete_project",
       "toolset": "project",
       "mutationClass": "destructive",
+      "origin": "upstream",
       "upstreamSource": "src/tools/deleteProject.ts",
       "upstreamTest": "src/tools/deleteProject.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "delete_version",
       "toolset": "issue",
       "mutationClass": "destructive",
+      "origin": "upstream",
       "upstreamSource": "src/tools/deleteVersion.ts",
       "upstreamTest": "src/tools/deleteVersion.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "delete_watching",
       "toolset": "issue",
       "mutationClass": "destructive",
+      "origin": "upstream",
       "upstreamSource": "src/tools/deleteWatching.ts",
       "upstreamTest": "src/tools/deleteWatching.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_categories",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getCategories.ts",
       "upstreamTest": "src/tools/getCategories.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_custom_fields",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getCustomFields.ts",
       "upstreamTest": "src/tools/getCustomFields.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_document",
       "toolset": "document",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getDocument.ts",
       "upstreamTest": "src/tools/getDocument.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_document_tree",
       "toolset": "document",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getDocumentTree.ts",
       "upstreamTest": "src/tools/getDocumentTree.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_documents",
       "toolset": "document",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getDocuments.ts",
       "upstreamTest": "src/tools/getDocuments.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_git_repositories",
       "toolset": "git",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getGitRepositories.ts",
       "upstreamTest": "src/tools/getGitRepositories.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_git_repository",
       "toolset": "git",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getGitRepository.ts",
       "upstreamTest": "src/tools/getGitRepository.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_issue",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getIssue.ts",
       "upstreamTest": "src/tools/getIssue.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_issue_comments",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getIssueComments.ts",
       "upstreamTest": "src/tools/getIssueComments.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_issue_types",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getIssueTypes.ts",
       "upstreamTest": "src/tools/getIssueTypes.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_issues",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getIssues.ts",
       "upstreamTest": "src/tools/getIssues.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_myself",
       "toolset": "space",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getMyself.ts",
       "upstreamTest": "src/tools/getMyself.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_notifications",
       "toolset": "notifications",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getNotifications.ts",
       "upstreamTest": "src/tools/getNotifications.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_priorities",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getPriorities.ts",
       "upstreamTest": "src/tools/getPriorities.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_project",
       "toolset": "project",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getProject.ts",
       "upstreamTest": "src/tools/getProject.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_project_list",
       "toolset": "project",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getProjectList.ts",
       "upstreamTest": "src/tools/getProjectList.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_project_users",
       "toolset": "project",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getProjectUsers.ts",
       "upstreamTest": "src/tools/getProjectUsers.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_pull_request",
       "toolset": "git",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getPullRequest.ts",
       "upstreamTest": "src/tools/getPullRequest.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_pull_request_comments",
       "toolset": "git",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getPullRequestComments.ts",
       "upstreamTest": "src/tools/getPullRequestComments.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_pull_requests",
       "toolset": "git",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getPullRequests.ts",
       "upstreamTest": "src/tools/getPullRequests.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_pull_requests_count",
       "toolset": "git",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getPullRequestsCount.ts",
       "upstreamTest": "src/tools/getPullRequestsCount.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
+    },
+    {
+      "operation": "get_rate_limit",
+      "toolset": "backlog-api",
+      "mutationClass": "read",
+      "origin": "backlog-api",
+      "upstreamSource": null,
+      "upstreamTest": null,
+      "targetEntry": "src/core/local-tools.ts",
+      "targetTest": "tests/access-policy-and-rate-limit.test.mjs"
     },
     {
       "operation": "get_resolutions",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getResolutions.ts",
       "upstreamTest": "src/tools/getResolutions.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_space",
       "toolset": "space",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getSpace.ts",
       "upstreamTest": "src/tools/getSpace.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_space_activities",
       "toolset": "space",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getSpaceActivities.ts",
       "upstreamTest": "src/tools/getSpaceActivities.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_user_recent_updates",
       "toolset": "space",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getUserRecentUpdates.ts",
       "upstreamTest": "src/tools/getUserRecentUpdates.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_user_stars_count",
       "toolset": "space",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getUserStarsCount.ts",
       "upstreamTest": "src/tools/getUserStarsCount.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_users",
       "toolset": "space",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getUsers.ts",
       "upstreamTest": "src/tools/getUsers.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_version_milestone_list",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getVersionMilestoneList.ts",
       "upstreamTest": "src/tools/getVersionMilestoneList.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_watching_list_count",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getWatchingListCount.ts",
       "upstreamTest": "src/tools/getWatchingListCount.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_watching_list_items",
       "toolset": "issue",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getWatchingListItems.ts",
       "upstreamTest": "src/tools/getWatchingListItems.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_wiki",
       "toolset": "wiki",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getWiki.ts",
       "upstreamTest": "src/tools/getWiki.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_wiki_pages",
       "toolset": "wiki",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getWikiPages.ts",
       "upstreamTest": "src/tools/getWikiPages.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "get_wikis_count",
       "toolset": "wiki",
       "mutationClass": "read",
+      "origin": "upstream",
       "upstreamSource": "src/tools/getWikisCount.ts",
       "upstreamTest": "src/tools/getWikisCount.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "mark_notification_as_read",
       "toolset": "notifications",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/markNotificationAsRead.ts",
       "upstreamTest": "src/tools/markNotificationAsRead.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "mark_watching_as_read",
       "toolset": "issue",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/markWatchingAsRead.ts",
       "upstreamTest": "src/tools/markWatchingAsRead.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "reset_unread_notification_count",
       "toolset": "notifications",
       "mutationClass": "broad-mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/resetUnreadNotificationCount.ts",
       "upstreamTest": "src/tools/resetUnreadNotificationCount.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "update_issue",
       "toolset": "issue",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/updateIssue.ts",
       "upstreamTest": "src/tools/updateIssue.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "update_project",
       "toolset": "project",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/updateProject.ts",
       "upstreamTest": "src/tools/updateProject.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "update_pull_request",
       "toolset": "git",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/updatePullRequest.ts",
       "upstreamTest": "src/tools/updatePullRequest.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "update_pull_request_comment",
       "toolset": "git",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/updatePullRequestComment.ts",
       "upstreamTest": "src/tools/updatePullRequestComment.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "update_version_milestone",
       "toolset": "issue",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/updateVersionMilestone.ts",
       "upstreamTest": "src/tools/updateVersionMilestone.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "update_watching",
       "toolset": "issue",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/updateWatching.ts",
       "upstreamTest": "src/tools/updateWatching.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
       "operation": "update_wiki",
       "toolset": "wiki",
       "mutationClass": "mutation",
+      "origin": "upstream",
       "upstreamSource": "src/tools/updateWiki.ts",
       "upstreamTest": "src/tools/updateWiki.test.ts",
-      "targetEntry": "src/core/run-operation.ts"
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
     }
   ]
 }

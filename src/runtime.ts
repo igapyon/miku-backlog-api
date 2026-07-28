@@ -2,15 +2,11 @@ export { listOperations } from "./core/catalog.js";
 export type {
   BacklogAccessEvent,
   BacklogPaginationMetadata,
+  BacklogRateLimitMetadata,
   BacklogResourceIdentifiers,
   CrudPermission,
   RunOperationOptions
 } from "./core/contracts.js";
 export { getMapping, getUpstreamTrace } from "./core/traceability.js";
 export { runOperation } from "./core/run-operation.js";
-
-export const product = Object.freeze({
-  name: "backlog-api",
-  version: "0.3.4",
-  upstream: "backlog-mcp-server@0.13.2"
-});
+export { product } from "./product.js";

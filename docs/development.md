@@ -3,7 +3,7 @@
 ## Initial Design Record
 
 - checked date: 2026-07-22
-- repository version: `0.3.4`
+- repository version: `0.4.0`
 - implementation maturity: beta standalone Node Core/CLI
 - split source: `backlog-api-skills` initial combined implementation
 
@@ -38,6 +38,9 @@ This repository owns:
 - direct upstream handler invocation
 - JSON envelopes and CLI exit behavior
 - dry-run and destructive-operation guards
+- environment-level CRUD permission allow-list
+- response-scoped rate-limit metadata and the Node-specific `get_rate_limit`
+  operation
 - upstream source, test, and operation traceability
 - Node build, tests, runtime artifacts, and releases
 
@@ -48,10 +51,13 @@ cross-product integrations.
 ## Adopted Decisions
 
 - preserve every upstream normal tool name as one Node operation
+- expose `get_rate_limit` as a clearly identified Node-specific operation
 - use one generic, tested operation runner instead of duplicating 58 handlers
 - generate and commit an upstream tool mapping
 - bundle CLI and importable runtime artifacts separately
 - require a CLI-level confirmation flag for destructive and broad-reset calls
+- default `BACKLOG_API_ALLOWED_PERMISSIONS` to `READ` and treat it as the
+  maximum permission boundary for CLI and Node API calls
 - keep API access summaries opt-in with `--verbose` and emit structured JSON on
   stderr
 - expose only whitelisted resource identifiers and execution metadata; omit

@@ -1,5 +1,10 @@
 import type { BacklogAccessEvent, CrudPermission } from "./contracts.js";
 import {
+  capturedBacklogResponse,
+  createBacklogAccessContext,
+  runWithBacklogAccessContext
+} from "./backlog-access-context.js";
+import {
   extractHttpStatus,
   extractInputAccessMetadata,
   extractResultIdentifiers
@@ -47,23 +52,38 @@ export function observeBacklogClient<T extends object>(
         } satisfies Omit<BacklogAccessEvent, "phase">;
 
         context.onAccess?.({ phase: "start", ...event });
+        const accessContext = createBacklogAccessContext();
         try {
-          const result: unknown = await Reflect.apply(value, target, args);
+          const result: unknown = await runWithBacklogAccessContext(
+            accessContext,
+            async () => Reflect.apply(value, target, args)
+          );
+          const response = capturedBacklogResponse(accessContext);
           const resultIdentifiers = extractResultIdentifiers(context.operation, result);
           context.onAccess?.({
             phase: "success",
             ...event,
             ...(resultIdentifiers === undefined ? {} : { result: resultIdentifiers }),
+            ...(response?.httpStatus === undefined
+              ? {}
+              : { httpStatus: response.httpStatus }),
+            ...(response?.rateLimit === undefined
+              ? {}
+              : { rateLimit: response.rateLimit }),
             durationMs: elapsedMilliseconds(startedAt)
           });
           return result;
         } catch (error) {
-          const status = extractHttpStatus(error);
+          const response = capturedBacklogResponse(accessContext);
+          const status = response?.httpStatus ?? extractHttpStatus(error);
           context.onAccess?.({
             phase: "failure",
             ...event,
             durationMs: elapsedMilliseconds(startedAt),
-            ...(status === undefined ? {} : { httpStatus: status })
+            ...(status === undefined ? {} : { httpStatus: status }),
+            ...(response?.rateLimit === undefined
+              ? {}
+              : { rateLimit: response.rateLimit })
           });
           throw error;
         }

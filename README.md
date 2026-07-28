@@ -28,7 +28,8 @@ node bundle/backlog-api.mjs call get_issue --input request.json
 ```
 
 The CLI supports all 58 normal tools registered by the checked upstream
-`v0.13.2` source. `call` reads one JSON object and writes one structured JSON
+`v0.13.2` source plus the Node-specific `get_rate_limit` operation. `call`
+reads one JSON object and writes one structured JSON
 envelope containing the result, diagnostics, and upstream trace information.
 
 Delete operations and broad notification reset require
@@ -56,6 +57,54 @@ verbose: {"type":"backlog-api-access","phase":"success","access":1,"operation":"
 categories explicitly with `--allow CREATE`, `--allow UPDATE`, or
 `--allow DELETE`. Delete operations require both `--allow DELETE` and
 `--confirm-destructive`; these are independent safeguards.
+
+`BACKLOG_API_ALLOWED_PERMISSIONS` sets the environment-level maximum CRUD
+permissions. It is a comma-separated list containing `READ`, `CREATE`,
+`UPDATE`, and/or `DELETE`. When it is unset, it defaults to `READ`. Whitespace
+around commas and values is ignored, values are case-insensitive, and duplicate
+values are normalized. Empty elements and unknown values are configuration
+errors. When the variable is defined, `READ` is not added implicitly.
+
+The environment setting and the call-level `--allow` are both required for a
+write. `--allow` cannot enable a permission omitted from the environment
+setting. This is a client-side safety boundary; it does not change Backlog
+account permissions or create a read-only API key.
+
+```bash
+# No environment setting is needed for read-only use.
+node bundle/backlog-api.mjs call get_issue --input request.json
+
+# CREATE must be allowed by both the environment and this call.
+BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE \
+  node bundle/backlog-api.mjs call add_issue --input request.json --allow CREATE
+
+# DELETE additionally requires destructive-operation confirmation.
+BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE,UPDATE,DELETE \
+  node bundle/backlog-api.mjs call delete_issue --input request.json \
+  --allow DELETE --confirm-destructive
+```
+
+The Node API applies the same rules. Omitting `RunOperationOptions.env` uses
+`process.env`; omitting `allowedPermissions` permits only `READ` for that call.
+
+### Rate limits
+
+The Node-specific `get_rate_limit` READ operation calls Backlog
+`GET /api/v2/rateLimit` and returns the `read`, `update`, `search`, and `icon`
+limits. The call itself consumes one API request. In a multi-organization
+configuration, select the connection with the normal top-level
+`organization` input property.
+
+```bash
+printf '{}\n' | node bundle/backlog-api.mjs call get_rate_limit
+```
+
+When `--verbose` is enabled, successful and failed API outcome events include
+the actual HTTP status and any valid `X-RateLimit-Limit`,
+`X-RateLimit-Remaining`, and `X-RateLimit-Reset` values captured from that
+response. Reset time is exposed as UTC ISO 8601 under `rateLimit.resetAt`.
+Missing or invalid header values are omitted. Request URLs, API keys, bodies,
+error bodies, and all other headers remain excluded.
 
 Add a top-level `fields` property to the input JSON to select result fields
 with the upstream GraphQL-style syntax:

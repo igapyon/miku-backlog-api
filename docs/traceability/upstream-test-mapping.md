@@ -21,6 +21,12 @@ Target test layers:
 - `tests/node-cli.test.mjs`
   - metadata commands
   - JSON stdout and exit-code behavior
+- `tests/access-policy-and-rate-limit.test.mjs`
+  - environment CRUD permission parsing and enforcement
+  - Node-specific `get_rate_limit`
+  - rate-limit response-header validation
+  - parallel access-context isolation
+  - representative CRUD response metadata
 - `scripts/smoke-node.mjs`
   - generated CLI metadata commands and importable runtime startup
 
