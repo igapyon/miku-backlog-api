@@ -45,7 +45,8 @@ Call options:
   --input <file>          Read the request object from a UTF-8 JSON file.
   --input -               Read the request object from stdin (default).
   --allow <permissions>   Allow comma-separated CRUD permissions. Defaults to
-                          READ. Values: READ, CREATE, UPDATE, DELETE.
+                          READ. Values: READ, CREATE, UPDATE, DELETE. This
+                          cannot exceed BACKLOG_API_ALLOWED_PERMISSIONS.
   --dry-run               Validate and normalize input without invoking Backlog.
   --confirm-destructive   Explicitly authorize delete_* or broad reset calls.
   --verbose               Write a safe summary of each Backlog API access to
@@ -73,8 +74,8 @@ Output:
 
 Safety:
   Calls allow READ operations only by default. CREATE, UPDATE, and DELETE must
-  be explicitly enabled with --allow. This is a client-side execution policy,
-  not a Backlog account permission.
+  be enabled both by BACKLOG_API_ALLOWED_PERMISSIONS and --allow. This is a
+  client-side execution policy, not a Backlog account permission.
 
   delete_* and reset_unread_notification_count require
   --confirm-destructive when applicable, independently of --allow. DELETE
@@ -84,6 +85,28 @@ Environment:
   BACKLOG_DOMAIN and BACKLOG_API_KEY configure one connection. The upstream
   BACKLOG_DEFAULT_ORG and BACKLOG_ORG_<NAME>_* variables configure multiple
   organizations. Metadata commands do not require credentials.
+
+  BACKLOG_API_ALLOWED_PERMISSIONS is a comma-separated environment-level
+  maximum using READ, CREATE, UPDATE, and DELETE. It defaults to READ when
+  unset. Whitespace around commas and values is ignored. --allow cannot enable
+  a permission omitted here. When the variable is set, READ is not added
+  implicitly. Values are case-insensitive and duplicates are normalized.
+  Empty elements and unknown values are configuration errors detected before
+  Backlog credentials or clients are resolved.
+
+  A write requires its permission in both BACKLOG_API_ALLOWED_PERMISSIONS and
+  --allow. DELETE additionally requires --confirm-destructive.
+
+  Examples:
+    BACKLOG_API_ALLOWED_PERMISSIONS=READ
+    BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE,UPDATE
+    BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE,UPDATE,DELETE
+
+Rate limits:
+  get_rate_limit is a backlog-api-specific READ operation returning the read,
+  update, search, and icon limits. Calling it consumes one API request.
+  --verbose outcome events include validated X-RateLimit values and an actual
+  HTTP status when the Backlog response exposes them.
 
 Exit codes:
   0  Successful metadata command or operation.
@@ -97,8 +120,9 @@ Examples:
   printf '{"issueKey":"PROJ-1","fields":"{ id summary }"}\\n' | backlog-api call get_issue
   backlog-api call get_issue --input request.json --dry-run
   backlog-api call get_issue --input request.json --verbose
-  backlog-api call add_issue --input request.json --allow CREATE
-  backlog-api call delete_issue --input request.json --allow DELETE --confirm-destructive
+  BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE backlog-api call add_issue --input request.json --allow CREATE
+  BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE,UPDATE,DELETE backlog-api call delete_issue --input request.json --allow DELETE --confirm-destructive
+  printf '{}\\n' | BACKLOG_API_ALLOWED_PERMISSIONS=READ backlog-api call get_rate_limit
 `;
 
 main().catch((error) => {

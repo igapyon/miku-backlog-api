@@ -1,5 +1,9 @@
 import { parseBacklogAPIError } from "backlog-mcp-server/build/backlog/parseBacklogAPIError.js";
-import { createBacklogClientRegistry } from "backlog-mcp-server/build/utils/backlogClientRegistry.js";
+import {
+  BACKLOG_API_ALLOWED_PERMISSIONS,
+  environmentAllowedPermissions
+} from "./access-permissions.js";
+import { createBacklogClientRegistry } from "./backlog-client-registry.js";
 import { classifyMutation, requiredPermission, resolveTool } from "./catalog.js";
 import type {
   DiagnosticCode,
@@ -20,11 +24,26 @@ export async function runOperation(
   const trace = getUpstreamTrace(operation);
   const mutationClass = classifyMutation(operation);
   const permission = requiredPermission(operation);
+  const env = options.env ?? process.env;
+  let environmentPermissions;
+  try {
+    environmentPermissions = environmentAllowedPermissions(env);
+  } catch (error) {
+    return failure(operation, "CONFIGURATION_ERROR", errorMessage(error), trace);
+  }
 
-  if (
-    options.allowedPermissions !== undefined &&
-    !options.allowedPermissions.includes(permission)
-  ) {
+  if (!environmentPermissions.includes(permission)) {
+    return failure(
+      operation,
+      "ACCESS_PERMISSION_REQUIRED",
+      `Operation ${operation} requires ${permission}, but ${permission} is not enabled by ` +
+      `${BACKLOG_API_ALLOWED_PERMISSIONS}.`,
+      trace
+    );
+  }
+
+  const callPermissions = options.allowedPermissions ?? ["READ"];
+  if (!callPermissions.includes(permission)) {
     return failure(
       operation,
       "PERMISSION_REQUIRED",
@@ -59,9 +78,7 @@ export async function runOperation(
 
   let registry;
   try {
-    registry = options.registry ?? createBacklogClientRegistry(
-      options.env === undefined ? {} : { env: options.env }
-    );
+    registry = options.registry ?? createBacklogClientRegistry({ env });
   } catch (error) {
     return failure(operation, "CONFIGURATION_ERROR", errorMessage(error), trace);
   }

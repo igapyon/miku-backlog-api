@@ -7,6 +7,7 @@ export type MutationClass =
   | "broad-mutation";
 
 export type DiagnosticCode =
+  | "ACCESS_PERMISSION_REQUIRED"
   | "PERMISSION_REQUIRED"
   | "INVALID_INPUT"
   | "INVALID_FIELDS"
@@ -25,9 +26,10 @@ export interface Diagnostic {
 }
 
 export interface UpstreamTrace {
+  origin: "upstream" | "backlog-api";
   repository: string;
   version: string;
-  commit: string;
+  commit?: string;
   operation: string;
   source: string | undefined;
   test: string | null | undefined;
@@ -59,6 +61,12 @@ export interface BacklogPaginationMetadata {
   count?: number;
 }
 
+export interface BacklogRateLimitMetadata {
+  limit?: number;
+  remaining?: number;
+  resetAt?: string;
+}
+
 export interface BacklogAccessEvent {
   phase: BacklogAccessPhase;
   access: number;
@@ -70,6 +78,7 @@ export interface BacklogAccessEvent {
   result?: BacklogResourceIdentifiers;
   changedFields?: readonly string[];
   pagination?: BacklogPaginationMetadata;
+  rateLimit?: BacklogRateLimitMetadata;
   durationMs?: number;
   httpStatus?: number;
 }

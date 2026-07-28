@@ -34,18 +34,32 @@ for (const filename of fs.readdirSync(upstreamToolsRoot).sort(compareUtf16)) {
 const operations = listOperations().map((operation) => {
   const upstreamSource = sourceByOperation.get(operation.name);
   if (!upstreamSource) {
-    throw new Error(`no upstream source mapping for operation: ${operation.name}`);
+    if (operation.name !== "get_rate_limit") {
+      throw new Error(`no upstream source mapping for operation: ${operation.name}`);
+    }
+    return {
+      operation: operation.name,
+      toolset: operation.toolset,
+      mutationClass: operation.mutationClass,
+      origin: "backlog-api",
+      upstreamSource: null,
+      upstreamTest: null,
+      targetEntry: "src/core/local-tools.ts",
+      targetTest: "tests/access-policy-and-rate-limit.test.mjs"
+    };
   }
   const upstreamTest = upstreamSource.replace(/\.ts$/, ".test.ts");
   return {
     operation: operation.name,
     toolset: operation.toolset,
     mutationClass: operation.mutationClass,
+    origin: "upstream",
     upstreamSource,
     upstreamTest: fs.existsSync(path.resolve(upstreamRoot, upstreamTest))
       ? upstreamTest
       : null,
-    targetEntry: "src/core/run-operation.ts"
+    targetEntry: "src/core/run-operation.ts",
+    targetTest: "tests/upstream-differential.test.mjs"
   };
 });
 

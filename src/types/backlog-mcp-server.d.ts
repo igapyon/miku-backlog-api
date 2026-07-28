@@ -2,14 +2,6 @@ declare module "backlog-mcp-server/build/backlog/parseBacklogAPIError.js" {
   export function parseBacklogAPIError(error: unknown): { message: string } | undefined;
 }
 
-declare module "backlog-mcp-server/build/utils/backlogClientRegistry.js" {
-  export function createBacklogClientRegistry(options: {
-    env?: NodeJS.ProcessEnv;
-  }): {
-    resolveClient(organization?: string): object;
-  };
-}
-
 declare module "backlog-mcp-server/build/tools/tools.js" {
   interface ToolDefinition {
     name: string;
