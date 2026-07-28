@@ -7,7 +7,7 @@ const CLI = "bundle/backlog-api.mjs";
 test("CLI metadata commands do not require credentials", () => {
   const version = run(["--version"]);
   assert.equal(version.status, 0);
-  assert.equal(version.stdout, "0.4.0\n");
+  assert.equal(version.stdout, "0.4.1\n");
   assert.equal(version.stderr, "");
 
   const help = run(["--help"]);
@@ -24,6 +24,7 @@ test("CLI metadata commands do not require credentials", () => {
   assert.match(help.stdout, /READ is not added\s+implicitly/);
   assert.match(help.stdout, /requires its permission in both/);
   assert.match(help.stdout, /configuration errors detected before/);
+  assert.match(help.stdout, /Unknown options, duplicate options/);
   assert.doesNotMatch(
     help.stdout,
     /^\s*backlog-api call delete_issue .*--allow DELETE/m
@@ -94,6 +95,23 @@ test("CLI reports invalid fields as a structured usage failure", () => {
   assert.equal(result.status, 2);
   assert.equal(result.stderr, "");
   assert.equal(JSON.parse(result.stdout).diagnostics[0].code, "INVALID_FIELDS");
+});
+
+test("CLI rejects unknown, duplicate, and extra arguments", () => {
+  const cases = [
+    [["call", "get_issue", "--unknown"], /Unknown option for call/],
+    [["call", "get_issue", "--dry-run", "--dry-run"], /specified only once/],
+    [["call", "get_issue", "extra"], /Unexpected argument for call/],
+    [["tools", "list", "extra"], /does not accept additional arguments/],
+    [["trace", "get_issue", "extra"], /at most one operation name/]
+  ];
+
+  for (const [args, expectedError] of cases) {
+    const result = run(args);
+    assert.equal(result.status, 2);
+    assert.equal(result.stdout, "");
+    assert.match(result.stderr, expectedError);
+  }
 });
 
 function run(args, input = "", extraEnv = {}) {

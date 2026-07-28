@@ -4,7 +4,10 @@ import {
   createBacklogCapturingFetch,
   extractBacklogResponseMetadata
 } from "../dist/ts/core/backlog-access-context.js";
-import { environmentAllowedPermissions } from "../dist/ts/core/access-permissions.js";
+import {
+  environmentAllowedPermissions,
+  parseCrudPermissions
+} from "../dist/ts/core/access-permissions.js";
 import { runOperation } from "../dist/ts/core/run-operation.js";
 import { observeBacklogClient } from "../dist/ts/core/verbose-client.js";
 
@@ -21,6 +24,13 @@ test("environment CRUD permissions default, normalize, and reject malformed valu
       () => environmentAllowedPermissions({ BACKLOG_API_ALLOWED_PERMISSIONS: value }),
       /BACKLOG_API_ALLOWED_PERMISSIONS/
     );
+  }
+});
+
+test("environment and call-level permissions share one parser", () => {
+  assert.deepEqual(parseCrudPermissions(" read , CREATE,read "), ["READ", "CREATE"]);
+  for (const value of ["", "READ,,CREATE", "READ CREATE", "READ,WRITE"]) {
+    assert.throws(() => parseCrudPermissions(value), /empty or unsupported/);
   }
 });
 
