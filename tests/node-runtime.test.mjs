@@ -57,6 +57,24 @@ test("mutation classification preserves unusual upstream names", () => {
   assert.equal(requiredPermission("mark_notification_as_read"), "UPDATE");
   assert.equal(requiredPermission("reset_unread_notification_count"), "UPDATE");
   assert.equal(requiredPermission("delete_project"), "DELETE");
+  assert.throws(
+    () => classifyMutation("archive_issue"),
+    /has no declared access policy/
+  );
+});
+
+test("unknown operations fail before permission configuration or client resolution", async () => {
+  const result = await runOperation("archive_issue", {}, {
+    env: { BACKLOG_API_ALLOWED_PERMISSIONS: "READ,,UPDATE" },
+    registry: {
+      resolveClient() {
+        throw new Error("must not resolve");
+      }
+    }
+  });
+
+  assert.equal(result.success, false);
+  assert.equal(result.diagnostics[0].code, "UNKNOWN_OPERATION");
 });
 
 test("permission policy rejects operations before client resolution", async () => {

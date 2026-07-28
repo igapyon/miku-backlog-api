@@ -2,11 +2,11 @@
 
 import fs from "node:fs";
 import { listOperations } from "./core/catalog.js";
-import type {
-  BacklogAccessEvent,
-  CrudPermission,
-  RunOperationOptions
-} from "./core/contracts.js";
+import {
+  CliUsageError,
+  parseCliArguments
+} from "./core/cli-arguments.js";
+import type { BacklogAccessEvent, RunOperationOptions } from "./core/contracts.js";
 import { getMapping } from "./core/traceability.js";
 import { runOperation } from "./core/run-operation.js";
 import { formatBacklogAccessEvent } from "./core/verbose-format.js";
@@ -55,6 +55,8 @@ Call options:
                           changed field names, pagination, and an exposed HTTP
                           failure status. Content values, credentials, personal
                           data, full arguments/results, and error text are omitted.
+  Each option may be specified once. Unknown options, duplicate options, and
+  extra positional arguments are usage errors.
 
 Input JSON:
   The input must be exactly one JSON object. Operation arguments are top-level
@@ -132,51 +134,55 @@ main().catch((error) => {
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
-  if (args.length === 0 || args.includes("--help") || args[0] === "help") {
+  let command;
+  try {
+    command = parseCliArguments(args);
+  } catch (error) {
+    if (!(error instanceof CliUsageError)) {
+      throw error;
+    }
+    process.stderr.write(`${error.message}\n`);
+    process.exitCode = 2;
+    return;
+  }
+
+  if (command.kind === "help") {
     process.stdout.write(HELP);
     return;
   }
-  if (args.includes("--version")) {
+  if (command.kind === "version") {
     process.stdout.write(`${product.version}\n`);
     return;
   }
-  if (args[0] === "tools" && args[1] === "list") {
+  if (command.kind === "tools-list") {
     writeJson({ schemaVersion: 1, product, operations: listOperations() });
     return;
   }
-  if (args[0] === "trace") {
+  if (command.kind === "trace") {
     const mapping = getMapping();
-    const operation = args[1];
     writeJson(
-      operation
+      command.operation
         ? {
             ...mapping.upstream,
-            operation: mapping.operations.find((entry) => entry.operation === operation)
+            operation: mapping.operations.find(
+              (entry) => entry.operation === command.operation
+            )
           }
         : mapping
     );
     return;
   }
-  if (args[0] === "call" && args[1]) {
-    const inputPath = optionValue(args, "--input") ?? "-";
-    let allowedPermissions;
-    try {
-      allowedPermissions = parseAllowedPermissions(optionValue(args, "--allow"));
-    } catch (error) {
-      process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
-      process.exitCode = 2;
-      return;
-    }
-    const input = JSON.parse(await readInput(inputPath));
+  if (command.kind === "call") {
+    const input = JSON.parse(await readInput(command.inputPath));
     const options: RunOperationOptions = {
-      dryRun: args.includes("--dry-run"),
-      confirmDestructive: args.includes("--confirm-destructive"),
-      allowedPermissions
+      dryRun: command.dryRun,
+      confirmDestructive: command.confirmDestructive,
+      allowedPermissions: command.allowedPermissions
     };
-    if (args.includes("--verbose")) {
+    if (command.verbose) {
       options.onAccess = writeVerboseEvent;
     }
-    const result = await runOperation(args[1], input, options);
+    const result = await runOperation(command.operation, input, options);
     writeJson(result);
     if (!result.success) {
       process.exitCode = result.diagnostics.some((diagnostic) =>
@@ -185,39 +191,6 @@ async function main(): Promise<void> {
     }
     return;
   }
-
-  process.stderr.write("Unknown command. Use --help for usage.\n");
-  process.exitCode = 2;
-}
-
-function optionValue(args: string[], name: string): string | undefined {
-  const index = args.indexOf(name);
-  if (index < 0) {
-    return undefined;
-  }
-  const value = args[index + 1];
-  if (!value || value.startsWith("--")) {
-    throw new Error(`${name} requires a value.`);
-  }
-  return value;
-}
-
-function parseAllowedPermissions(value: string | undefined): CrudPermission[] {
-  if (value === undefined) {
-    return ["READ"];
-  }
-  const supported = new Set<CrudPermission>(["READ", "CREATE", "UPDATE", "DELETE"]);
-  const permissions = [...new Set(value.split(",").map((entry) => entry.trim().toUpperCase()))];
-  const invalid = permissions.filter(
-    (permission) => !supported.has(permission as CrudPermission)
-  );
-  if (invalid.length > 0) {
-    throw new Error(
-      `--allow contains unsupported permission(s): ${invalid.join(", ")}. ` +
-      "Use READ, CREATE, UPDATE, or DELETE."
-    );
-  }
-  return permissions as CrudPermission[];
 }
 
 async function readInput(inputPath: string): Promise<string> {

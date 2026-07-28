@@ -10,7 +10,7 @@
   "target": {
     "repository": "backlog-api",
     "product": "backlog-api",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "strategy": "published-handler-direct-invocation"
   },
   "operations": [

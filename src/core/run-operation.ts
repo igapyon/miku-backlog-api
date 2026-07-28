@@ -1,10 +1,16 @@
 import { parseBacklogAPIError } from "backlog-mcp-server/build/backlog/parseBacklogAPIError.js";
 import {
   BACKLOG_API_ALLOWED_PERMISSIONS,
+  DEFAULT_CRUD_PERMISSIONS,
   environmentAllowedPermissions
 } from "./access-permissions.js";
 import { createBacklogClientRegistry } from "./backlog-client-registry.js";
-import { classifyMutation, requiredPermission, resolveTool } from "./catalog.js";
+import {
+  classifyMutation,
+  hasOperation,
+  requiredPermission,
+  resolveTool
+} from "./catalog.js";
 import type {
   DiagnosticCode,
   OperationFailure,
@@ -22,8 +28,17 @@ export async function runOperation(
   options: RunOperationOptions = {}
 ): Promise<OperationResult> {
   const trace = getUpstreamTrace(operation);
-  const mutationClass = classifyMutation(operation);
-  const permission = requiredPermission(operation);
+  if (!hasOperation(operation)) {
+    return failure(operation, "UNKNOWN_OPERATION", `Unknown operation: ${operation}`, trace);
+  }
+  let mutationClass;
+  let permission;
+  try {
+    mutationClass = classifyMutation(operation);
+    permission = requiredPermission(operation);
+  } catch (error) {
+    return failure(operation, "CONFIGURATION_ERROR", errorMessage(error), trace);
+  }
   const env = options.env ?? process.env;
   let environmentPermissions;
   try {
@@ -42,7 +57,7 @@ export async function runOperation(
     );
   }
 
-  const callPermissions = options.allowedPermissions ?? ["READ"];
+  const callPermissions = options.allowedPermissions ?? DEFAULT_CRUD_PERMISSIONS;
   if (!callPermissions.includes(permission)) {
     return failure(
       operation,
