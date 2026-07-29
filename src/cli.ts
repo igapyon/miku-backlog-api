@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import fs from "node:fs";
-import { listOperations } from "./core/catalog.js";
+import { describeOperation, listOperations } from "./core/catalog.js";
 import {
   CliUsageError,
   parseCliArguments
@@ -18,6 +18,7 @@ Usage:
   backlog-api --version
   backlog-api --help
   backlog-api tools list
+  backlog-api tools describe <operation>
   backlog-api trace [operation]
   backlog-api call <operation> [--input <file|->] [--allow <permissions>]
       [--dry-run] [--confirm-destructive] [--verbose]
@@ -31,7 +32,13 @@ Commands:
 
   tools list
       Print a JSON catalog of available operations. Each entry includes the
-      operation name, description, toolset, and mutation classification.
+      operation name, description, toolset, mutation classification, and
+      required permission.
+
+  tools describe <operation>
+      Print the machine-readable contract for one operation: input JSON Schema,
+      result fields available to "fields", safety requirements, and examples.
+      No Backlog credentials are required.
 
   trace [operation]
       Print JSON traceability metadata for all operations or one operation.
@@ -39,7 +46,9 @@ Commands:
 
   call <operation>
       Read one JSON object, invoke the named operation, and print one JSON
-      result envelope. Use "tools list" to discover operation names.
+      result envelope. Use "tools list" to discover operation names and
+      "tools describe <operation>" to discover its input contract.
+      "call <operation> --help" is an alias for "tools describe <operation>".
 
 Call options:
   --input <file>          Read the request object from a UTF-8 JSON file.
@@ -47,7 +56,9 @@ Call options:
   --allow <permissions>   Allow comma-separated CRUD permissions. Defaults to
                           READ. Values: READ, CREATE, UPDATE, DELETE. This
                           cannot exceed BACKLOG_API_ALLOWED_PERMISSIONS.
-  --dry-run               Validate and normalize input without invoking Backlog.
+  --dry-run               Validate and normalize input without resolving a
+                          Backlog connection or requiring credentials. Write
+                          permissions and destructive confirmation still apply.
   --confirm-destructive   Explicitly authorize delete_* or broad reset calls.
   --verbose               Write a safe summary of each Backlog API access to
                           stderr as a "verbose: " prefixed JSON object. A
@@ -66,7 +77,7 @@ Input JSON:
   only selected result fields.
 
 Output:
-  "tools list", "trace", and "call" write machine-readable JSON to stdout.
+  All commands except --help and --version write machine-readable JSON to stdout.
   A call result contains schemaVersion, operation, success, diagnostics,
   trace, and either result or dryRun/input data. --help and --version are the
   only plain-text stdout commands. Unexpected CLI errors are written to stderr.
@@ -85,8 +96,9 @@ Safety:
 
 Environment:
   BACKLOG_DOMAIN and BACKLOG_API_KEY configure one connection. The upstream
-  BACKLOG_DEFAULT_ORG and BACKLOG_ORG_<NAME>_* variables configure multiple
-  organizations. Metadata commands do not require credentials.
+  BACKLOG_DEFAULT_ORG, BACKLOG_ORG_<NAME>_DOMAIN, and
+  BACKLOG_ORG_<NAME>_API_KEY variables configure multiple organizations.
+  Metadata commands do not require credentials.
 
   BACKLOG_API_ALLOWED_PERMISSIONS is a comma-separated environment-level
   maximum using READ, CREATE, UPDATE, and DELETE. It defaults to READ when
@@ -115,8 +127,16 @@ Exit codes:
   1  Configuration, confirmation, organization, or Backlog API failure.
   2  CLI usage, fields-selection, or operation input-schema failure.
 
+Agent discovery:
+  1. Run "tools list" to choose an operation and inspect its safety class.
+  2. Run "tools describe <operation>" to obtain its complete input contract.
+  3. Run "call <operation> --dry-run" with the intended JSON.
+  4. Only after successful validation, run the call without --dry-run.
+
 Examples:
   backlog-api tools list
+  backlog-api tools describe get_issue
+  backlog-api call get_issue --help
   backlog-api trace get_issue
   printf '{"issueKey":"PROJ-1"}\\n' | backlog-api call get_issue
   printf '{"issueKey":"PROJ-1","fields":"{ id summary }"}\\n' | backlog-api call get_issue
@@ -156,6 +176,18 @@ async function main(): Promise<void> {
   }
   if (command.kind === "tools-list") {
     writeJson({ schemaVersion: 1, product, operations: listOperations() });
+    return;
+  }
+  if (command.kind === "tools-describe") {
+    const operation = describeOperation(command.operation);
+    if (operation === undefined) {
+      process.stderr.write(
+        `Unknown operation: ${command.operation}. Use "tools list" to discover operation names.\n`
+      );
+      process.exitCode = 2;
+      return;
+    }
+    writeJson({ schemaVersion: 1, product, operation });
     return;
   }
   if (command.kind === "trace") {

@@ -39,6 +39,11 @@ use the same envelope with `success: false` and error diagnostics.
 - no MCP content blocks or protocol transport
 - no MCP dynamic-toolset calls
 - GraphQL-style `fields` selection is accepted as a top-level input property
+- `tools describe <operation>` exposes the input and result-field schemas as
+  credential-free JSON for agent discovery
+- handler-level ID/key and ID/name alternatives are validated before dry-run
+  succeeds
+- dry-run validates without resolving a Backlog connection
 - invalid `fields` is rejected before invoking Backlog, while the upstream MCP
   wrapper parses the selection after its handler returns
 - MCP token-count truncation is not exposed because its character cut can

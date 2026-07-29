@@ -1,6 +1,8 @@
 import { allTools } from "backlog-mcp-server/build/tools/tools.js";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import type { CrudPermission, MutationClass } from "./contracts.js";
 import { createLocalToolset } from "./local-tools.js";
+import { getAlternativeFieldConstraints } from "./operation-input-constraints.js";
 
 interface OperationPolicy {
   mutationClass: MutationClass;
@@ -119,6 +121,39 @@ export function listOperations() {
     .sort((left, right) => compareUtf16(left.name, right.name));
 }
 
+export function describeOperation(operationName: string) {
+  const resolved = resolveTool(metadataOnlyClient, operationName);
+  if (resolved === undefined) {
+    return undefined;
+  }
+  const policy = requireOperationPolicy(operationName);
+  const inputSchema = addCliInputMetadata(
+    toJsonSchema(resolved.tool.schema),
+    operationName
+  );
+  const outputSchema = resolved.tool.outputSchema === undefined
+    ? undefined
+    : toJsonSchema(resolved.tool.outputSchema);
+  const examples = OPERATION_EXAMPLES.get(operationName);
+  return {
+    name: resolved.tool.name,
+    description: resolved.tool.description,
+    toolset: resolved.toolset,
+    ...policy,
+    requiresConfirmation:
+      policy.mutationClass === "destructive" ||
+      policy.mutationClass === "broad-mutation",
+    supportsDryRun: true,
+    credentialsRequiredForDryRun: false,
+    inputSchema,
+    ...(outputSchema === undefined ? {} : { outputFieldSchema: outputSchema }),
+    ...(resolved.tool.importantFields === undefined
+      ? {}
+      : { importantOutputFields: resolved.tool.importantFields }),
+    ...(examples === undefined ? {} : { examples })
+  };
+}
+
 export function hasOperation(operationName: string): boolean {
   return createToolsets().some((toolset) =>
     toolset.tools.some((tool) => tool.name === operationName)
@@ -164,4 +199,73 @@ function policyEntries(
 
 function compareUtf16(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
+}
+
+type JsonObject = Record<string, unknown>;
+
+const OPERATION_EXAMPLES = new Map<string, readonly JsonObject[]>([
+  ["get_issue", [{ issueKey: "PROJ-1" }, { issueId: 12345 }]],
+  ["get_project", [{ projectKey: "PROJ" }, { projectId: 12345 }]],
+  ["get_rate_limit", [{}]],
+  [
+    "add_issue",
+    [{
+      projectId: 12345,
+      summary: "Example issue",
+      issueTypeId: 1,
+      priorityId: 3
+    }]
+  ],
+  ["delete_issue", [{ issueKey: "PROJ-1" }]]
+]);
+
+function toJsonSchema(schema: unknown): JsonObject {
+  return zodToJsonSchema(
+    schema as Parameters<typeof zodToJsonSchema>[0],
+    { target: "jsonSchema7" }
+  ) as JsonObject;
+}
+
+function addCliInputMetadata(
+  schema: JsonObject,
+  operationName: string
+): JsonObject {
+  const properties = isJsonObject(schema.properties)
+    ? schema.properties
+    : {};
+  const constraints = getAlternativeFieldConstraints(operationName);
+  const existingAllOf = Array.isArray(schema.allOf) ? schema.allOf : [];
+  return {
+    ...schema,
+    properties: {
+      ...properties,
+      organization: {
+        type: "string",
+        description:
+          "Configured Backlog organization name. Omit to use the default connection."
+      },
+      fields: {
+        type: "string",
+        description:
+          'GraphQL-style result field selection, for example "{ id summary }".'
+      }
+    },
+    ...(constraints.length === 0
+      ? {}
+      : {
+          allOf: [
+            ...existingAllOf,
+            ...constraints.map((constraint) => ({
+              description: constraint.message,
+              anyOf: constraint.fields.map((field) => ({
+                required: [field]
+              }))
+            }))
+          ]
+        })
+  };
+}
+
+function isJsonObject(value: unknown): value is JsonObject {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
