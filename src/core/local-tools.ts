@@ -1,6 +1,14 @@
+import { z } from "zod";
+
 interface LocalBacklogClient {
   getRateLimit(): Promise<unknown>;
 }
+
+const rateLimitBucketSchema = z.object({
+  limit: z.number(),
+  remaining: z.number(),
+  reset: z.number()
+});
 
 export function createLocalToolset(backlog: object) {
   const client = backlog as LocalBacklogClient;
@@ -13,27 +21,16 @@ export function createLocalToolset(backlog: object) {
         name: "get_rate_limit",
         description:
           "Get Backlog API rate limits for read, update, search, and icon requests.",
-        schema: {
-          safeParse(input: unknown) {
-            if (
-              typeof input !== "object" ||
-              input === null ||
-              Array.isArray(input) ||
-              Object.keys(input).length > 0
-            ) {
-              return {
-                success: false as const,
-                error: {
-                  issues: [{
-                    path: [] as PropertyKey[],
-                    message: "get_rate_limit does not accept operation arguments."
-                  }]
-                }
-              };
-            }
-            return { success: true as const, data: {} };
-          }
-        },
+        schema: z.object({}).strict(),
+        outputSchema: z.object({
+          rateLimit: z.object({
+            read: rateLimitBucketSchema,
+            update: rateLimitBucketSchema,
+            search: rateLimitBucketSchema,
+            icon: rateLimitBucketSchema
+          })
+        }),
+        importantFields: ["rateLimit"],
         async handler() {
           return client.getRateLimit();
         }

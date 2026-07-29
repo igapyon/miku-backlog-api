@@ -4,6 +4,7 @@ import path from "node:path";
 import test from "node:test";
 import {
   classifyMutation,
+  describeOperation,
   listOperations,
   requiredPermission
 } from "../dist/ts/core/catalog.js";
@@ -44,6 +45,21 @@ test("generated Node runtime excludes upstream MCP and HTTP server modules", () 
   assert.equal(inputs.some((entry) => entry.includes("@modelcontextprotocol")), false);
   assert.equal(inputs.some((entry) => entry.includes("@hono/")), false);
   assert.equal(inputs.some((entry) => entry.includes("httpMcpServer")), false);
+});
+
+test("all operations expose machine-readable agent contracts", () => {
+  for (const catalogEntry of listOperations()) {
+    const description = describeOperation(catalogEntry.name);
+    assert.notEqual(description, undefined);
+    assert.equal(description.name, catalogEntry.name);
+    assert.equal(description.requiredPermission, catalogEntry.requiredPermission);
+    assert.equal(description.inputSchema.type, "object");
+    assert.equal(description.inputSchema.properties.organization.type, "string");
+    assert.equal(description.inputSchema.properties.fields.type, "string");
+    assert.equal(description.credentialsRequiredForDryRun, false);
+    assert.equal(typeof description.outputFieldSchema, "object");
+  }
+  assert.equal(describeOperation("not_an_operation"), undefined);
 });
 
 test("mutation classification preserves unusual upstream names", () => {

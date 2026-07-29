@@ -7,13 +7,15 @@ const CLI = "bundle/backlog-api.mjs";
 test("CLI metadata commands do not require credentials", () => {
   const version = run(["--version"]);
   assert.equal(version.status, 0);
-  assert.equal(version.stdout, "0.4.1\n");
+  assert.equal(version.stdout, "0.5.0\n");
   assert.equal(version.stderr, "");
 
   const help = run(["--help"]);
   assert.equal(help.status, 0);
   assert.equal(help.stderr, "");
   assert.match(help.stdout, /backlog-api call <operation>/);
+  assert.match(help.stdout, /tools describe <operation>/);
+  assert.match(help.stdout, /Agent discovery:/);
   assert.match(help.stdout, /machine-readable JSON to stdout/);
   assert.match(help.stdout, /--confirm-destructive/);
   assert.match(help.stdout, /--verbose/);
@@ -44,6 +46,65 @@ test("CLI metadata commands do not require credentials", () => {
     catalog.operations.find((operation) => operation.name === "get_rate_limit").requiredPermission,
     "READ"
   );
+
+  const description = JSON.parse(run(["tools", "describe", "get_issue"]).stdout);
+  assert.equal(description.operation.name, "get_issue");
+  assert.equal(description.operation.requiredPermission, "READ");
+  assert.equal(description.operation.requiresConfirmation, false);
+  assert.equal(description.operation.credentialsRequiredForDryRun, false);
+  assert.equal(description.operation.inputSchema.properties.issueId.type, "number");
+  assert.equal(description.operation.inputSchema.properties.issueKey.type, "string");
+  assert.equal(description.operation.inputSchema.properties.organization.type, "string");
+  assert.equal(description.operation.inputSchema.properties.fields.type, "string");
+  assert.deepEqual(description.operation.inputSchema.allOf[0].anyOf, [
+    { required: ["issueId"] },
+    { required: ["issueKey"] }
+  ]);
+  assert.equal(description.operation.outputFieldSchema.properties.summary.type, "string");
+  assert.deepEqual(description.operation.examples, [
+    { issueKey: "PROJ-1" },
+    { issueId: 12345 }
+  ]);
+
+  const alias = JSON.parse(run(["call", "get_issue", "--help"]).stdout);
+  assert.deepEqual(alias, description);
+
+  const localDescription = JSON.parse(
+    run(["tools", "describe", "get_rate_limit"]).stdout
+  );
+  assert.deepEqual(localDescription.operation.inputSchema.required, undefined);
+  assert.equal(
+    localDescription.operation.outputFieldSchema.properties.rateLimit.type,
+    "object"
+  );
+});
+
+test("CLI dry-run validates complete input without Backlog credentials", () => {
+  const valid = run(
+    ["call", "get_issue", "--input", "-", "--dry-run"],
+    '{"issueKey":"TEST-1"}'
+  );
+  assert.equal(valid.status, 0);
+  assert.equal(JSON.parse(valid.stdout).dryRun, true);
+
+  for (const [operation, path] of [
+    ["get_issue", "issueId|issueKey"],
+    ["get_project", "projectId|projectKey"]
+  ]) {
+    const invalid = run(["call", operation, "--input", "-", "--dry-run"], "{}");
+    assert.equal(invalid.status, 2);
+    const body = JSON.parse(invalid.stdout);
+    assert.equal(body.diagnostics[0].code, "INVALID_ARGUMENT");
+    assert.equal(body.diagnostics[0].path, path);
+  }
+
+  const write = run(
+    ["call", "add_issue", "--input", "-", "--allow", "CREATE", "--dry-run"],
+    '{"projectId":1,"summary":"Test","issueTypeId":2,"priorityId":3}',
+    { BACKLOG_API_ALLOWED_PERMISSIONS: "CREATE" }
+  );
+  assert.equal(write.status, 0);
+  assert.equal(JSON.parse(write.stdout).dryRun, true);
 });
 
 test("CLI allows READ only by default and checks permissions before credentials", () => {
@@ -103,6 +164,8 @@ test("CLI rejects unknown, duplicate, and extra arguments", () => {
     [["call", "get_issue", "--dry-run", "--dry-run"], /specified only once/],
     [["call", "get_issue", "extra"], /Unexpected argument for call/],
     [["tools", "list", "extra"], /does not accept additional arguments/],
+    [["tools", "describe"], /requires an operation name/],
+    [["tools", "describe", "get_issue", "extra"], /does not accept additional arguments/],
     [["trace", "get_issue", "extra"], /at most one operation name/]
   ];
 
@@ -112,6 +175,11 @@ test("CLI rejects unknown, duplicate, and extra arguments", () => {
     assert.equal(result.stdout, "");
     assert.match(result.stderr, expectedError);
   }
+
+  const unknown = run(["tools", "describe", "not_an_operation"]);
+  assert.equal(unknown.status, 2);
+  assert.equal(unknown.stdout, "");
+  assert.match(unknown.stderr, /Unknown operation/);
 });
 
 function run(args, input = "", extraEnv = {}) {

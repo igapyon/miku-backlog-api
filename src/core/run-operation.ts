@@ -19,6 +19,7 @@ import type {
   UpstreamTrace
 } from "./contracts.js";
 import { selectResultFields, validateFieldsSelection } from "./field-selection.js";
+import { validateOperationInputConstraints } from "./operation-input-constraints.js";
 import { getUpstreamTrace } from "./traceability.js";
 import { observeBacklogClient } from "./verbose-client.js";
 
@@ -91,13 +92,6 @@ export async function runOperation(
     );
   }
 
-  let registry;
-  try {
-    registry = options.registry ?? createBacklogClientRegistry({ env });
-  } catch (error) {
-    return failure(operation, "CONFIGURATION_ERROR", errorMessage(error), trace);
-  }
-
   const { organization, fields: _fields, ...toolInput } = request;
   if (organization !== undefined && typeof organization !== "string") {
     return failure(
@@ -106,6 +100,41 @@ export async function runOperation(
       "organization must be a string when provided.",
       trace
     );
+  }
+
+  const metadataResolved = resolveTool({}, operation);
+  if (!metadataResolved) {
+    return failure(operation, "UNKNOWN_OPERATION", `Unknown operation: ${operation}`, trace);
+  }
+
+  if (options.dryRun === true) {
+    const validation = validateToolInput(
+      operation,
+      metadataResolved.toolset,
+      metadataResolved.tool.schema,
+      toolInput,
+      trace
+    );
+    if (!validation.ok) {
+      return validation.failure;
+    }
+    return {
+      schemaVersion: 1,
+      operation,
+      toolset: metadataResolved.toolset,
+      success: true,
+      dryRun: true,
+      input: validation.data,
+      diagnostics: [],
+      trace
+    };
+  }
+
+  let registry;
+  try {
+    registry = options.registry ?? createBacklogClientRegistry({ env });
+  } catch (error) {
+    return failure(operation, "CONFIGURATION_ERROR", errorMessage(error), trace);
   }
   let backlog;
   try {
@@ -129,42 +158,20 @@ export async function runOperation(
   if (!resolved) {
     return failure(operation, "UNKNOWN_OPERATION", `Unknown operation: ${operation}`, trace);
   }
-
-  const parsed = resolved.tool.schema.safeParse(toolInput);
-  if (!parsed.success) {
-    return {
-      schemaVersion: 1,
-      operation,
-      toolset: resolved.toolset,
-      success: false,
-      diagnostics: parsed.error.issues.map((issue) => ({
-        code: "INVALID_ARGUMENT",
-        severity: "error",
-        path: issue.path.map(String).join("."),
-        message: issue.message
-      })),
-      trace
-    };
+  const validation = validateToolInput(
+    operation,
+    resolved.toolset,
+    resolved.tool.schema,
+    toolInput,
+    trace
+  );
+  if (!validation.ok) {
+    return validation.failure;
   }
-  if (isRecord(parsed.data)) {
-    verboseContext.input = parsed.data;
-  }
-
-  if (options.dryRun === true) {
-    return {
-      schemaVersion: 1,
-      operation,
-      toolset: resolved.toolset,
-      success: true,
-      dryRun: true,
-      input: parsed.data,
-      diagnostics: [],
-      trace
-    };
-  }
+  verboseContext.input = validation.record;
 
   try {
-    const result = await resolved.tool.handler(parsed.data);
+    const result = await resolved.tool.handler(validation.data);
     const selectedResult = await selectResultFields(result, fields);
     return {
       schemaVersion: 1,
@@ -185,6 +192,69 @@ export async function runOperation(
       resolved.toolset
     );
   }
+}
+
+interface ToolInputSchema {
+  safeParse(input: unknown):
+    | { success: true; data: unknown }
+    | {
+        success: false;
+        error: {
+          issues: Array<{ path: PropertyKey[]; message: string }>;
+        };
+      };
+}
+
+type ToolInputValidation =
+  | { ok: true; data: unknown; record: Record<string, unknown> }
+  | { ok: false; failure: OperationFailure };
+
+function validateToolInput(
+  operation: string,
+  toolset: string,
+  schema: ToolInputSchema,
+  input: Record<string, unknown>,
+  trace: UpstreamTrace
+): ToolInputValidation {
+  const parsed = schema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      failure: {
+        schemaVersion: 1,
+        operation,
+        toolset,
+        success: false,
+        diagnostics: parsed.error.issues.map((issue) => ({
+          code: "INVALID_ARGUMENT",
+          severity: "error",
+          path: issue.path.map(String).join("."),
+          message: issue.message
+        })),
+        trace
+      }
+    };
+  }
+  const record = isRecord(parsed.data) ? parsed.data : {};
+  const constraintIssues = validateOperationInputConstraints(operation, record);
+  if (constraintIssues.length > 0) {
+    return {
+      ok: false,
+      failure: {
+        schemaVersion: 1,
+        operation,
+        toolset,
+        success: false,
+        diagnostics: constraintIssues.map((issue) => ({
+          code: "INVALID_ARGUMENT",
+          severity: "error",
+          ...issue
+        })),
+        trace
+      }
+    };
+  }
+  return { ok: true, data: parsed.data, record };
 }
 
 function failure(

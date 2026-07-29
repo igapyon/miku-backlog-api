@@ -9,6 +9,7 @@ export type CliCommand =
   | { kind: "help" }
   | { kind: "version" }
   | { kind: "tools-list" }
+  | { kind: "tools-describe"; operation: string }
   | { kind: "trace"; operation?: string }
   | {
       kind: "call";
@@ -28,7 +29,19 @@ export class CliUsageError extends Error {
 }
 
 export function parseCliArguments(args: readonly string[]): CliCommand {
-  if (args.length === 0 || args.includes("--help")) {
+  if (args.length === 0) {
+    return { kind: "help" };
+  }
+  if (
+    args[0] === "call" &&
+    args.length === 3 &&
+    args[1] !== undefined &&
+    !args[1].startsWith("--") &&
+    args[2] === "--help"
+  ) {
+    return { kind: "tools-describe", operation: args[1] };
+  }
+  if (args.includes("--help")) {
     return { kind: "help" };
   }
   if (args[0] === "help") {
@@ -42,6 +55,14 @@ export function parseCliArguments(args: readonly string[]): CliCommand {
   if (args[0] === "tools" && args[1] === "list") {
     requireArgumentCount(args, 2, "tools list");
     return { kind: "tools-list" };
+  }
+  if (args[0] === "tools" && args[1] === "describe") {
+    const operation = args[2];
+    if (operation === undefined || operation.startsWith("--")) {
+      throw new CliUsageError("tools describe requires an operation name.");
+    }
+    requireArgumentCount(args, 3, "tools describe");
+    return { kind: "tools-describe", operation };
   }
   if (args[0] === "trace") {
     if (args.length > 2) {

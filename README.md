@@ -23,6 +23,7 @@ repository.
 ```bash
 node bundle/backlog-api.mjs --version
 node bundle/backlog-api.mjs tools list
+node bundle/backlog-api.mjs tools describe get_issue
 node bundle/backlog-api.mjs trace get_issue
 node bundle/backlog-api.mjs call get_issue --input request.json
 ```
@@ -32,9 +33,24 @@ The CLI supports all 58 normal tools registered by the checked upstream
 reads one JSON object and writes one structured JSON
 envelope containing the result, diagnostics, and upstream trace information.
 
+`tools describe <operation>` is the agent-oriented discovery command. It
+returns the operation input as JSON Schema, the result-field schema used by
+GraphQL-style `fields` selection, important output fields, mutation and
+permission metadata, confirmation requirements, and curated examples when
+available. `call <operation> --help` is an alias for the same credential-free
+JSON output.
+
 Delete operations and broad notification reset require
 `--confirm-destructive`. Use `--dry-run` to validate input without calling
-Backlog.
+Backlog or resolving a configured connection. Write permissions and destructive
+confirmation continue to apply during dry-run.
+
+For an agent workflow:
+
+1. Run `tools list` to choose an operation and inspect its safety class.
+2. Run `tools describe <operation>` to obtain the input contract.
+3. Run `call <operation> --dry-run` with the intended JSON.
+4. Run the call without `--dry-run` only after validation succeeds.
 
 Use `--verbose` to write a short event for the start and outcome of each
 Backlog API access to stderr. Events identify the operation, Backlog client

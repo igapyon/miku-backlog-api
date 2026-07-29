@@ -16,6 +16,8 @@ declare module "backlog-mcp-server/build/tools/tools.js" {
             };
           };
     };
+    outputSchema?: unknown;
+    importantFields?: readonly string[];
     handler(input: unknown): Promise<unknown>;
   }
 
