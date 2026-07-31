@@ -18,9 +18,14 @@
 - [ ] Confirm that CI and release workflows pass independently in both
       repositories and that the Node release contains no Agent Skill files.
 - [x] Register the Node-specific GitHub Issues as
-      [Issues #2–#7](https://github.com/igapyon/backlog-api/issues).
+      [Issues #2–#7 and #18](https://github.com/igapyon/backlog-api/issues).
 
 ## Node Compatibility and Maintenance
 
+- [x] Refresh the upstream compatibility baseline to `backlog-mcp-server`
+      v0.14.0 for [Issue #18](https://github.com/igapyon/backlog-api/issues/18),
+      including operation mapping, safety contracts, differential tests, and
+      downstream handoff prerequisites for [Issue #7](https://github.com/igapyon/backlog-api/issues/7).
+
 Node compatibility and maintenance work is tracked in
-[GitHub Issues #2–#7](https://github.com/igapyon/backlog-api/issues).
+[GitHub Issues #2–#7 and #18](https://github.com/igapyon/backlog-api/issues).

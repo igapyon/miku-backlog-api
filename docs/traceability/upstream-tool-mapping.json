@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "upstream": {
     "repository": "https://github.com/nulab/backlog-mcp-server",
-    "version": "0.13.2",
-    "tag": "v0.13.2",
-    "commit": "d12f010de976af11bcd43f1d3497dc7043d26e62",
-    "checked": "2026-07-22"
+    "version": "0.14.0",
+    "tag": "v0.14.0",
+    "commit": "9da42fcfb5b69f1455e3864c49f2b57a45a4cbe9",
+    "checked": "2026-07-31"
   },
   "target": {
     "repository": "backlog-api",
     "product": "backlog-api",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "strategy": "published-handler-direct-invocation"
   },
   "operations": [
@@ -71,6 +71,16 @@
       "origin": "upstream",
       "upstreamSource": "src/tools/addPullRequestComment.ts",
       "upstreamTest": "src/tools/addPullRequestComment.test.ts",
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
+    },
+    {
+      "operation": "add_related_issue",
+      "toolset": "issue",
+      "mutationClass": "mutation",
+      "origin": "upstream",
+      "upstreamSource": "src/tools/addRelatedIssue.ts",
+      "upstreamTest": "src/tools/addRelatedIssue.test.ts",
       "targetEntry": "src/core/run-operation.ts",
       "targetTest": "tests/upstream-differential.test.mjs"
     },
@@ -385,6 +395,16 @@
       "targetTest": "tests/access-policy-and-rate-limit.test.mjs"
     },
     {
+      "operation": "get_related_issues",
+      "toolset": "issue",
+      "mutationClass": "read",
+      "origin": "upstream",
+      "upstreamSource": "src/tools/getRelatedIssues.ts",
+      "upstreamTest": "src/tools/getRelatedIssues.test.ts",
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
+    },
+    {
       "operation": "get_resolutions",
       "toolset": "issue",
       "mutationClass": "read",
@@ -525,6 +545,16 @@
       "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
+      "operation": "remove_related_issue",
+      "toolset": "issue",
+      "mutationClass": "destructive",
+      "origin": "upstream",
+      "upstreamSource": "src/tools/removeRelatedIssue.ts",
+      "upstreamTest": "src/tools/removeRelatedIssue.test.ts",
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
+    },
+    {
       "operation": "reset_unread_notification_count",
       "toolset": "notifications",
       "mutationClass": "broad-mutation",
@@ -541,6 +571,16 @@
       "origin": "upstream",
       "upstreamSource": "src/tools/updateIssue.ts",
       "upstreamTest": "src/tools/updateIssue.test.ts",
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
+    },
+    {
+      "operation": "update_issue_comment",
+      "toolset": "issue",
+      "mutationClass": "mutation",
+      "origin": "upstream",
+      "upstreamSource": "src/tools/updateIssueComment.ts",
+      "upstreamTest": "src/tools/updateIssueComment.test.ts",
       "targetEntry": "src/core/run-operation.ts",
       "targetTest": "tests/upstream-differential.test.mjs"
     },

@@ -47,6 +47,8 @@ export interface BacklogResourceIdentifiers {
   projectKey?: string;
   issueId?: number | readonly number[];
   issueKey?: string;
+  targetIssueId?: number;
+  relatedIssueId?: number;
   wikiId?: number;
   repositoryId?: number;
   repositoryName?: string;

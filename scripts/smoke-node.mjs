@@ -13,8 +13,8 @@ for (const args of [["--version"], ["--help"], ["tools", "list"]]) {
 
 const runtime = await import("../bundle/backlog-api-runtime.mjs");
 assert.equal(runtime.product.name, "backlog-api");
-assert.equal(runtime.product.version, "0.5.0");
-assert.equal(runtime.listOperations().length, 59);
+assert.equal(runtime.product.version, "0.6.0");
+assert.equal(runtime.listOperations().length, 63);
 assert.equal(
   runtime.listOperations().find((operation) => operation.name === "get_rate_limit")
     ?.requiredPermission,

@@ -55,6 +55,31 @@ Backlog APIからHTTP 400、エラーコード7が返され、プロジェクト
 `issueIdOrKey`を指定すると`Issue ID or key is required`となり、
 `issueKey`へ修正することで取得に成功しました。
 
+`issueId`と`issueKey`を同時に指定した場合、正の`issueId`を優先します。
+`issueId`が`0`以下の場合は、`issueKey`を指定していればそちらへフォールバック
+します。どちらも有効でない場合は入力エラーです。
+
+## Related Issues
+
+`get_related_issues`は、課題に紐づく関連課題を読み取ります。`issueId`または
+`issueKey`のいずれかが必要です。
+
+```json
+{"issueKey":"PROJECT-1"}
+```
+
+`add_related_issue`は、元課題の`issueId`または`issueKey`と、関連付け先の
+数値`targetIssueId`を必要とするCREATE操作です。
+
+```json
+{"issueKey":"PROJECT-1","targetIssueId":12346}
+```
+
+`remove_related_issue`は、元課題の`issueId`または`issueKey`と、解除する
+数値`relatedIssueId`を必要とするDELETE操作です。実行には環境側と呼び出し側の
+`DELETE`許可に加え、`--confirm-destructive`が必要です。作成・解除の前には
+同じ入力でdry-runを実行して確認してください。
+
 ## Issue Listing
 
 `get_issues`でプロジェクトを絞り込む場合、`projectId`は単一の数値ではなく
@@ -151,3 +176,11 @@ Backlog APIからHTTP 400、エラーコード7が返され、プロジェクト
 
 コメント追加はBacklogを変更する操作です。事前に同じ入力でdry-runを実行し、
 実行は1回に限定してください。
+
+`update_issue_comment`は、`issueId`または`issueKey`、数値`commentId`、
+新しい`content`を必要とするUPDATE操作です。環境側と呼び出し側の両方で
+`UPDATE`を許可したうえで、dry-runによる入力検証後に実行してください。
+
+```json
+{"issueKey":"PROJECT-1","commentId":12345,"content":"更新後のコメント"}
+```

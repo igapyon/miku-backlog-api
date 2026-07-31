@@ -1,10 +1,10 @@
 # Upstream Snapshot
 
 - repository: <https://github.com/nulab/backlog-mcp-server>
-- tag: `v0.13.2`
-- commit: `d12f010de976af11bcd43f1d3497dc7043d26e62`
-- npm package: `backlog-mcp-server@0.13.2`
-- checked: 2026-07-22
+- tag: `v0.14.0`
+- commit: `9da42fcfb5b69f1455e3864c49f2b57a45a4cbe9`
+- npm package: `backlog-mcp-server@0.14.0`
+- checked: 2026-07-31
 - local checkout: `workplace/upstream/backlog-mcp-server`
 - license: MIT
 

@@ -3,7 +3,7 @@
 ## Initial Design Record
 
 - checked date: 2026-07-22
-- repository version: `0.5.0`
+- repository version: `0.6.0`
 - implementation maturity: beta standalone Node Core/CLI
 - split source: `backlog-api-skills` initial combined implementation
 
@@ -19,9 +19,9 @@
 ## Upstream Anchor
 
 - repository: <https://github.com/nulab/backlog-mcp-server>
-- compatibility version: `v0.13.2`
-- checked commit: `d12f010de976af11bcd43f1d3497dc7043d26e62`
-- npm package: `backlog-mcp-server@0.13.2`
+- compatibility version: `v0.14.0`
+- checked commit: `9da42fcfb5b69f1455e3864c49f2b57a45a4cbe9`
+- npm package: `backlog-mcp-server@0.14.0`
 - upstream license: MIT
 - disposable checkout: `workplace/upstream/backlog-mcp-server`
 
@@ -52,7 +52,7 @@ cross-product integrations.
 
 - preserve every upstream normal tool name as one Node operation
 - expose `get_rate_limit` as a clearly identified Node-specific operation
-- use one generic, tested operation runner instead of duplicating 58 handlers
+- use one generic, tested operation runner instead of duplicating 62 handlers
 - generate and commit an upstream tool mapping
 - bundle CLI and importable runtime artifacts separately
 - require a CLI-level confirmation flag for destructive and broad-reset calls
