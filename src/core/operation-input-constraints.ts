@@ -5,10 +5,14 @@ export interface AlternativeFieldConstraint {
 
 const ISSUE_ID_OR_KEY_OPERATIONS = [
   "add_issue_comment",
+  "add_related_issue",
   "delete_issue",
   "get_issue",
   "get_issue_comments",
-  "update_issue"
+  "get_related_issues",
+  "remove_related_issue",
+  "update_issue",
+  "update_issue_comment"
 ] as const;
 
 const PROJECT_ID_OR_KEY_OPERATIONS = [

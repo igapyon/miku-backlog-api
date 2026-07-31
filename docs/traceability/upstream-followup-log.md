@@ -1,5 +1,20 @@
 # Upstream Follow-Up Log
 
+## 2026-07-31 — v0.14.0 Compatibility Refresh
+
+- pinned npm packages `backlog-mcp-server@0.14.0` and `backlog-js@0.19.0`
+- checked upstream tag `v0.14.0` at commit
+  `9da42fcfb5b69f1455e3864c49f2b57a45a4cbe9`
+- regenerated mappings for 62 upstream normal tools plus the Node-specific
+  `get_rate_limit` operation
+- exposed `update_issue_comment`, `get_related_issues`, `add_related_issue`,
+  and `remove_related_issue` with explicit READ/CREATE/UPDATE/DELETE policy
+  and destructive confirmation for relation removal
+- preserved `update_issue.parentIssueId` and non-positive `issueId` fallback to
+  `issueKey` through the upstream handlers
+- added differential coverage for all new and changed issue operations and
+  retained the Node-only permission, dry-run, verbose, and rate-limit guards
+
 ## 2026-07-22 — Initial v0.13.2 Conversion
 
 - pinned npm package `backlog-mcp-server@0.13.2`

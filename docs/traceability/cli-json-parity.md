@@ -9,6 +9,19 @@
 - upstream Backlog error parsing
 - upstream source and test identity in trace metadata
 
+## v0.14.0 Upstream Delta
+
+- `update_issue_comment` is exposed as an UPDATE operation.
+- `get_related_issues`, `add_related_issue`, and `remove_related_issue` are
+  exposed as READ, CREATE, and destructive DELETE operations respectively.
+- `update_issue` preserves the upstream optional `parentIssueId` input.
+- Issue handlers use `issueKey` when both identifiers are supplied and
+  `issueId` is non-positive, matching the upstream resolver.
+
+The Node policy layer adds the same issue ID/key alternative validation to the
+new issue operations. `remove_related_issue` is a DELETE operation and therefore
+also requires `--confirm-destructive`.
+
 ## CLI Envelope
 
 Successful calls write one JSON object to stdout:
@@ -58,6 +71,8 @@ use the same envelope with `success: false` and error diagnostics.
 - `--verbose` writes sanitized Backlog access start/outcome JSON events to
   stderr; a whitelist permits resource identifiers, duration, changed field
   names, pagination, actual response status, and validated rate-limit metadata
+- related-issue target and relation IDs are included as whitelisted resource
+  identifiers when supplied
 - content values, full request/response data, organization names, credentials,
 personal data, and upstream error text are omitted from verbose events
 - `get_rate_limit` is a Node-specific READ operation, not an upstream normal

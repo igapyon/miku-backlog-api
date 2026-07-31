@@ -28,8 +28,8 @@ node bundle/backlog-api.mjs trace get_issue
 node bundle/backlog-api.mjs call get_issue --input request.json
 ```
 
-The CLI supports all 58 normal tools registered by the checked upstream
-`v0.13.2` source plus the Node-specific `get_rate_limit` operation. `call`
+The CLI supports all 62 normal tools registered by the checked upstream
+`v0.14.0` source plus the Node-specific `get_rate_limit` operation. `call`
 reads one JSON object and writes one structured JSON
 envelope containing the result, diagnostics, and upstream trace information.
 
@@ -39,6 +39,19 @@ GraphQL-style `fields` selection, important output fields, mutation and
 permission metadata, confirmation requirements, and curated examples when
 available. `call <operation> --help` is an alias for the same credential-free
 JSON output.
+
+### Issue updates and relations
+
+The v0.14.0 compatibility baseline adds `update_issue_comment`,
+`get_related_issues`, `add_related_issue`, and `remove_related_issue`.
+`update_issue` also accepts an optional `parentIssueId`. Use `tools describe`
+for the exact input schema before calling an operation.
+
+`get_related_issues` is a READ operation. `add_related_issue` requires CREATE,
+`update_issue_comment` requires UPDATE, and `remove_related_issue` requires
+DELETE plus `--confirm-destructive`. Every operation accepts either a positive
+`issueId` or an `issueKey` for its source issue; when both are present, a
+non-positive `issueId` falls back to `issueKey`.
 
 Delete operations and broad notification reset require
 `--confirm-destructive`. Use `--dry-run` to validate input without calling
@@ -57,7 +70,7 @@ Backlog API access to stderr. Events identify the operation, Backlog client
 method, CRUD category, and whether the default or a named organization was
 selected. A strict whitelist also exposes resource identifiers such as
 `spaceKey`, `projectId`, and `issueKey`, IDs returned by successful API
-operations, duration, changed field names without values, pagination, and an
+operations, related-issue IDs, duration, changed field names without values, pagination, and an
 HTTP failure status when the upstream error exposes one.
 
 Each line starts with `verbose: ` followed by a JSON object. Request and

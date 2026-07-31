@@ -21,11 +21,11 @@ test("all upstream operations have deterministic source and test mappings", () =
   const runtimeNames = listOperations().map((entry) => entry.name);
   const mappedNames = mapping.operations.map((entry) => entry.operation);
 
-  assert.equal(runtimeNames.length, 59);
+  assert.equal(runtimeNames.length, 63);
   assert.deepEqual(mappedNames, runtimeNames);
   const upstreamEntries = mapping.operations.filter((entry) => entry.origin === "upstream");
   const localEntries = mapping.operations.filter((entry) => entry.origin === "backlog-api");
-  assert.equal(upstreamEntries.length, 58);
+  assert.equal(upstreamEntries.length, 62);
   assert.deepEqual(localEntries.map((entry) => entry.operation), ["get_rate_limit"]);
   assert.equal(localEntries[0].upstreamSource, null);
   assert.equal(localEntries[0].targetEntry, "src/core/local-tools.ts");
@@ -64,15 +64,23 @@ test("all operations expose machine-readable agent contracts", () => {
 
 test("mutation classification preserves unusual upstream names", () => {
   assert.equal(classifyMutation("get_issue"), "read");
+  assert.equal(classifyMutation("get_related_issues"), "read");
   assert.equal(classifyMutation("add_issue"), "mutation");
+  assert.equal(classifyMutation("add_related_issue"), "mutation");
   assert.equal(classifyMutation("addDocument"), "mutation");
+  assert.equal(classifyMutation("update_issue_comment"), "mutation");
   assert.equal(classifyMutation("delete_project"), "destructive");
+  assert.equal(classifyMutation("remove_related_issue"), "destructive");
   assert.equal(classifyMutation("reset_unread_notification_count"), "broad-mutation");
   assert.equal(requiredPermission("get_issue"), "READ");
+  assert.equal(requiredPermission("get_related_issues"), "READ");
   assert.equal(requiredPermission("addDocument"), "CREATE");
+  assert.equal(requiredPermission("add_related_issue"), "CREATE");
   assert.equal(requiredPermission("mark_notification_as_read"), "UPDATE");
+  assert.equal(requiredPermission("update_issue_comment"), "UPDATE");
   assert.equal(requiredPermission("reset_unread_notification_count"), "UPDATE");
   assert.equal(requiredPermission("delete_project"), "DELETE");
+  assert.equal(requiredPermission("remove_related_issue"), "DELETE");
   assert.throws(
     () => classifyMutation("archive_issue"),
     /has no declared access policy/
@@ -346,6 +354,39 @@ test("verbose metadata includes pagination and ID filters but omits search text"
   assert.doesNotMatch(events.map(formatBacklogAccessEvent).join("\n"), /SECRET|keyword/);
 });
 
+test("related-issue operations expose only whitelisted identifiers in verbose events", async () => {
+  const events = [];
+  const result = await runOperation(
+    "add_related_issue",
+    {
+      issueKey: "SAFE-5",
+      targetIssueId: 6,
+      note: "SECRET RELATION NOTE"
+    },
+    {
+      env: { BACKLOG_API_ALLOWED_PERMISSIONS: "CREATE" },
+      allowedPermissions: ["CREATE"],
+      registry: {
+        resolveClient() {
+          return {
+            async addRelatedIssue() {
+              return { id: 6, issueKey: "SAFE-6", summary: "SECRET RESULT" };
+            }
+          };
+        }
+      },
+      onAccess(event) {
+        events.push(event);
+      }
+    }
+  );
+
+  assert.equal(result.success, true);
+  assert.deepEqual(events[0].target, { issueKey: "SAFE-5", targetIssueId: 6 });
+  assert.deepEqual(events[1].result, { issueId: 6, issueKey: "SAFE-6" });
+  assert.doesNotMatch(events.map(formatBacklogAccessEvent).join("\n"), /SECRET|note/);
+});
+
 test("fields selects top-level and nested result data", async () => {
   const registry = {
     resolveClient() {
@@ -434,4 +475,17 @@ test("destructive operations require confirmation before client resolution", asy
 
   assert.equal(result.success, false);
   assert.equal(result.diagnostics[0].code, "CONFIRMATION_REQUIRED");
+
+  const removeRelated = await runOperation(
+    "remove_related_issue",
+    { issueKey: "TEST-1", relatedIssueId: 12345 },
+    {
+      registry,
+      env: { BACKLOG_API_ALLOWED_PERMISSIONS: "DELETE" },
+      allowedPermissions: ["DELETE"]
+    }
+  );
+
+  assert.equal(removeRelated.success, false);
+  assert.equal(removeRelated.diagnostics[0].code, "CONFIRMATION_REQUIRED");
 });

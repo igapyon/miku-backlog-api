@@ -7,7 +7,7 @@ const CLI = "bundle/backlog-api.mjs";
 test("CLI metadata commands do not require credentials", () => {
   const version = run(["--version"]);
   assert.equal(version.status, 0);
-  assert.equal(version.stdout, "0.5.0\n");
+  assert.equal(version.stdout, "0.6.0\n");
   assert.equal(version.stderr, "");
 
   const help = run(["--help"]);
@@ -33,7 +33,7 @@ test("CLI metadata commands do not require credentials", () => {
   );
 
   const catalog = JSON.parse(run(["tools", "list"]).stdout);
-  assert.equal(catalog.operations.length, 59);
+  assert.equal(catalog.operations.length, 63);
   assert.equal(
     catalog.operations.find((operation) => operation.name === "get_issue").requiredPermission,
     "READ"
@@ -45,6 +45,26 @@ test("CLI metadata commands do not require credentials", () => {
   assert.equal(
     catalog.operations.find((operation) => operation.name === "get_rate_limit").requiredPermission,
     "READ"
+  );
+  assert.equal(
+    catalog.operations.find((operation) => operation.name === "get_related_issues")
+      .requiredPermission,
+    "READ"
+  );
+  assert.equal(
+    catalog.operations.find((operation) => operation.name === "add_related_issue")
+      .requiredPermission,
+    "CREATE"
+  );
+  assert.equal(
+    catalog.operations.find((operation) => operation.name === "update_issue_comment")
+      .requiredPermission,
+    "UPDATE"
+  );
+  assert.equal(
+    catalog.operations.find((operation) => operation.name === "remove_related_issue")
+      .requiredPermission,
+    "DELETE"
   );
 
   const description = JSON.parse(run(["tools", "describe", "get_issue"]).stdout);
@@ -65,6 +85,23 @@ test("CLI metadata commands do not require credentials", () => {
     { issueKey: "PROJ-1" },
     { issueId: 12345 }
   ]);
+
+  const relatedDescription = JSON.parse(
+    run(["tools", "describe", "add_related_issue"]).stdout
+  );
+  assert.equal(relatedDescription.operation.requiredPermission, "CREATE");
+  assert.equal(relatedDescription.operation.requiresConfirmation, false);
+  assert.equal(relatedDescription.operation.inputSchema.properties.targetIssueId.type, "number");
+  assert.deepEqual(relatedDescription.operation.inputSchema.allOf[0].anyOf, [
+    { required: ["issueId"] },
+    { required: ["issueKey"] }
+  ]);
+
+  const removeRelatedDescription = JSON.parse(
+    run(["tools", "describe", "remove_related_issue"]).stdout
+  );
+  assert.equal(removeRelatedDescription.operation.requiredPermission, "DELETE");
+  assert.equal(removeRelatedDescription.operation.requiresConfirmation, true);
 
   const alias = JSON.parse(run(["call", "get_issue", "--help"]).stdout);
   assert.deepEqual(alias, description);
@@ -89,6 +126,7 @@ test("CLI dry-run validates complete input without Backlog credentials", () => {
 
   for (const [operation, path] of [
     ["get_issue", "issueId|issueKey"],
+    ["get_related_issues", "issueId|issueKey"],
     ["get_project", "projectId|projectKey"]
   ]) {
     const invalid = run(["call", operation, "--input", "-", "--dry-run"], "{}");
@@ -105,6 +143,14 @@ test("CLI dry-run validates complete input without Backlog credentials", () => {
   );
   assert.equal(write.status, 0);
   assert.equal(JSON.parse(write.stdout).dryRun, true);
+
+  const updateComment = run(
+    ["call", "update_issue_comment", "--input", "-", "--allow", "UPDATE", "--dry-run"],
+    '{"issueKey":"TEST-1","commentId":2,"content":"updated"}',
+    { BACKLOG_API_ALLOWED_PERMISSIONS: "UPDATE" }
+  );
+  assert.equal(updateComment.status, 0);
+  assert.equal(JSON.parse(updateComment.stdout).dryRun, true);
 });
 
 test("CLI allows READ only by default and checks permissions before credentials", () => {
@@ -146,6 +192,14 @@ test("CLI returns a structured confirmation error for destructive calls", () => 
   const body = JSON.parse(result.stdout);
   assert.equal(body.success, false);
   assert.equal(body.diagnostics[0].code, "CONFIRMATION_REQUIRED");
+
+  const removeRelated = run(
+    ["call", "remove_related_issue", "--input", "-", "--allow", "DELETE"],
+    '{"issueKey":"TEST-1","relatedIssueId":2}',
+    { BACKLOG_API_ALLOWED_PERMISSIONS: "DELETE" }
+  );
+  assert.equal(removeRelated.status, 1);
+  assert.equal(JSON.parse(removeRelated.stdout).diagnostics[0].code, "CONFIRMATION_REQUIRED");
 });
 
 test("CLI reports invalid fields as a structured usage failure", () => {

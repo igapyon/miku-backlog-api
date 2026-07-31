@@ -24,6 +24,7 @@ const OPERATION_POLICIES = new Map<string, OperationPolicy>([
     "get_issue_comments",
     "get_issue_types",
     "get_issues",
+    "get_related_issues",
     "get_myself",
     "get_notifications",
     "get_priorities",
@@ -55,6 +56,7 @@ const OPERATION_POLICIES = new Map<string, OperationPolicy>([
     "add_project",
     "add_pull_request",
     "add_pull_request_comment",
+    "add_related_issue",
     "add_version_milestone",
     "add_watching",
     "add_wiki"
@@ -63,6 +65,7 @@ const OPERATION_POLICIES = new Map<string, OperationPolicy>([
     "mark_notification_as_read",
     "mark_watching_as_read",
     "update_issue",
+    "update_issue_comment",
     "update_project",
     "update_pull_request",
     "update_pull_request_comment",
@@ -74,7 +77,8 @@ const OPERATION_POLICIES = new Map<string, OperationPolicy>([
     "delete_issue",
     "delete_project",
     "delete_version",
-    "delete_watching"
+    "delete_watching",
+    "remove_related_issue"
   ], "destructive", "DELETE"),
   ...policyEntries([
     "reset_unread_notification_count"
@@ -205,6 +209,7 @@ type JsonObject = Record<string, unknown>;
 
 const OPERATION_EXAMPLES = new Map<string, readonly JsonObject[]>([
   ["get_issue", [{ issueKey: "PROJ-1" }, { issueId: 12345 }]],
+  ["get_related_issues", [{ issueKey: "PROJ-1" }, { issueId: 12345 }]],
   ["get_project", [{ projectKey: "PROJ" }, { projectId: 12345 }]],
   ["get_rate_limit", [{}]],
   [
@@ -215,6 +220,12 @@ const OPERATION_EXAMPLES = new Map<string, readonly JsonObject[]>([
       issueTypeId: 1,
       priorityId: 3
     }]
+  ],
+  ["add_related_issue", [{ issueKey: "PROJ-1", targetIssueId: 12346 }]],
+  ["remove_related_issue", [{ issueKey: "PROJ-1", relatedIssueId: 12346 }]],
+  [
+    "update_issue_comment",
+    [{ issueKey: "PROJ-1", commentId: 12345, content: "Updated comment" }]
   ],
   ["delete_issue", [{ issueKey: "PROJ-1" }]]
 ]);

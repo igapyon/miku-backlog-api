@@ -3,9 +3,13 @@ import test from "node:test";
 import { backlogErrorHandler } from "backlog-mcp-server/build/backlog/backlogErrorHandler.js";
 import { composeToolHandler } from "backlog-mcp-server/build/handlers/builders/composeToolHandler.js";
 import { addIssueTool } from "backlog-mcp-server/build/tools/addIssue.js";
+import { addRelatedIssueTool } from "backlog-mcp-server/build/tools/addRelatedIssue.js";
 import { deleteIssueTool } from "backlog-mcp-server/build/tools/deleteIssue.js";
 import { getIssueTool } from "backlog-mcp-server/build/tools/getIssue.js";
+import { getRelatedIssuesTool } from "backlog-mcp-server/build/tools/getRelatedIssues.js";
+import { removeRelatedIssueTool } from "backlog-mcp-server/build/tools/removeRelatedIssue.js";
 import { updateIssueTool } from "backlog-mcp-server/build/tools/updateIssue.js";
+import { updateIssueCommentTool } from "backlog-mcp-server/build/tools/updateIssueComment.js";
 import { runOperation } from "../dist/ts/core/run-operation.js";
 
 const translation = {
@@ -51,6 +55,7 @@ const cases = [
       organization: "TEST",
       issueKey: "TEST-3",
       summary: "updated fixture",
+      parentIssueId: 99,
       customFields: [{ id: 41, value: ["one", "two"] }]
     },
     response: { id: 3, issueKey: "TEST-3", summary: "updated fixture" }
@@ -62,6 +67,43 @@ const cases = [
     factory: deleteIssueTool,
     input: { organization: "TEST", issueKey: "TEST-4" },
     response: { id: 4, issueKey: "TEST-4", summary: "deleted fixture" }
+  },
+  {
+    operation: "get_related_issues",
+    permission: "READ",
+    method: "getRelatedIssues",
+    factory: getRelatedIssuesTool,
+    input: { organization: "TEST", issueKey: "TEST-5" },
+    response: [{ id: 5, issueKey: "TEST-6", summary: "related fixture", type: "Relates" }]
+  },
+  {
+    operation: "add_related_issue",
+    permission: "CREATE",
+    method: "addRelatedIssue",
+    factory: addRelatedIssueTool,
+    input: { organization: "TEST", issueKey: "TEST-7", targetIssueId: 8 },
+    response: { id: 7, issueKey: "TEST-7", summary: "added relation", type: "Relates" }
+  },
+  {
+    operation: "update_issue_comment",
+    permission: "UPDATE",
+    method: "patchIssueComment",
+    factory: updateIssueCommentTool,
+    input: {
+      organization: "TEST",
+      issueKey: "TEST-8",
+      commentId: 9,
+      content: "updated comment fixture"
+    },
+    response: { id: 9, content: "updated comment fixture" }
+  },
+  {
+    operation: "remove_related_issue",
+    permission: "DELETE",
+    method: "removeRelatedIssue",
+    factory: removeRelatedIssueTool,
+    input: { organization: "TEST", issueKey: "TEST-9", relatedIssueId: 10 },
+    response: { id: 9, issueKey: "TEST-9", summary: "removed relation", type: "Relates" }
   }
 ];
 
@@ -136,6 +178,40 @@ test("fields selection matches the upstream composed MCP handler", async () => {
 
   assert.equal(nodeResult.success, true);
   assert.deepEqual(nodeResult.result, mcpData(upstreamResult));
+});
+
+test("non-positive issue IDs fall back to issueKey in both wrappers", async () => {
+  const input = { organization: "TEST", issueId: 0, issueKey: "TEST-10" };
+  const upstreamCalls = [];
+  const nodeCalls = [];
+  const upstreamTool = getIssueTool(mockBacklog("getIssue", {
+    id: 10,
+    issueKey: "TEST-10",
+    summary: "fallback fixture"
+  }, upstreamCalls), translation);
+  const upstreamHandler = composeToolHandler(upstreamTool, {
+    useFields: false,
+    errorHandler: backlogErrorHandler,
+    maxTokens: 100_000
+  });
+  const upstreamResult = await upstreamHandler(input, {});
+  const nodeResult = await runOperation("get_issue", input, {
+    registry: {
+      resolveClient() {
+        return mockBacklog("getIssue", {
+          id: 10,
+          issueKey: "TEST-10",
+          summary: "fallback fixture"
+        }, nodeCalls);
+      }
+    },
+    allowedPermissions: ["READ"]
+  });
+
+  assert.equal(nodeResult.success, true);
+  assert.deepEqual(nodeResult.result, mcpData(upstreamResult));
+  assert.deepEqual(upstreamCalls, [{ method: "getIssue", args: ["TEST-10"] }]);
+  assert.deepEqual(nodeCalls, upstreamCalls);
 });
 
 test("upstream and Node wrappers preserve the same Backlog error message", async () => {
