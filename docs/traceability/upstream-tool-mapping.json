@@ -8,9 +8,9 @@
     "checked": "2026-07-31"
   },
   "target": {
-    "repository": "backlog-api",
-    "product": "backlog-api",
-    "version": "0.6.0",
+    "repository": "miku-backlog-api",
+    "product": "miku-backlog-api",
+    "version": "0.7.0",
     "strategy": "published-handler-direct-invocation"
   },
   "operations": [
@@ -386,9 +386,9 @@
     },
     {
       "operation": "get_rate_limit",
-      "toolset": "backlog-api",
+      "toolset": "miku-backlog-api",
       "mutationClass": "read",
-      "origin": "backlog-api",
+      "origin": "miku-backlog-api",
       "upstreamSource": null,
       "upstreamTest": null,
       "targetEntry": "src/core/local-tools.ts",

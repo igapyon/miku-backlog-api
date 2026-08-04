@@ -3,7 +3,7 @@ import type { UpstreamTrace } from "./contracts.js";
 
 interface TraceMappingEntry {
   operation: string;
-  origin?: "upstream" | "backlog-api";
+  origin?: "upstream" | "miku-backlog-api";
   upstreamSource: string | null;
   upstreamTest: string | null;
   targetEntry: string;
@@ -19,9 +19,9 @@ const byOperation = new Map(
 
 export function getUpstreamTrace(operation: string): UpstreamTrace {
   const entry = byOperation.get(operation);
-  if (entry?.origin === "backlog-api") {
+  if (entry?.origin === "miku-backlog-api") {
     return {
-      origin: "backlog-api",
+      origin: "miku-backlog-api",
       repository: mapping.target.repository,
       version: mapping.target.version,
       operation,

@@ -39,9 +39,9 @@ jobs:
       - name: Verify runtime artifacts
         run: |
           set -euo pipefail
-          test -s bundle/backlog-api.mjs
-          test -s bundle/backlog-api-runtime.mjs
-          test -s bundle/backlog-api-sources.tgz
+          test -s bundle/miku-backlog-api.mjs
+          test -s bundle/miku-backlog-api-runtime.mjs
+          test -s bundle/miku-backlog-api-sources.tgz
           npm run smoke:node
 
       - name: Verify release tag version
@@ -67,9 +67,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p release-assets
-          cp bundle/backlog-api.mjs "release-assets/backlog-api-${{ steps.release_version.outputs.version }}.mjs"
-          cp bundle/backlog-api-runtime.mjs "release-assets/backlog-api-runtime-${{ steps.release_version.outputs.version }}.mjs"
-          cp bundle/backlog-api-sources.tgz "release-assets/backlog-api-sources-${{ steps.release_version.outputs.version }}.tgz"
+          cp bundle/miku-backlog-api.mjs "release-assets/miku-backlog-api-${{ steps.release_version.outputs.version }}.mjs"
+          cp bundle/miku-backlog-api-runtime.mjs "release-assets/miku-backlog-api-runtime-${{ steps.release_version.outputs.version }}.mjs"
+          cp bundle/miku-backlog-api-sources.tgz "release-assets/miku-backlog-api-sources-${{ steps.release_version.outputs.version }}.tgz"
           cd release-assets
           sha256sum * > SHA256SUMS
 

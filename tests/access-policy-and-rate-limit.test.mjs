@@ -86,8 +86,8 @@ test("get_rate_limit is a local READ operation", async () => {
   });
   assert.equal(result.success, true);
   assert.deepEqual(result.result, expected);
-  assert.equal(result.toolset, "backlog-api");
-  assert.equal(result.trace.origin, "backlog-api");
+  assert.equal(result.toolset, "miku-backlog-api");
+  assert.equal(result.trace.origin, "miku-backlog-api");
   assert.equal(result.trace.source, "src/core/local-tools.ts");
 });
 

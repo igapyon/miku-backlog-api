@@ -1,6 +1,6 @@
-# backlog-api
+# miku-backlog-api
 
-`backlog-api` is a Node Core/CLI straight conversion of the published
+`miku-backlog-api` is a Node Core/CLI straight conversion of the published
 [Nulab Backlog MCP Server](https://github.com/nulab/backlog-mcp-server) tool
 handlers.
 
@@ -20,12 +20,16 @@ repository.
 
 ## Node CLI
 
+`miku-backlog-api` is the canonical command and bundle name. The package also
+provides `backlog-api` as a compatibility command alias throughout the `0.7.x`
+release line; new scripts and documentation use the canonical name.
+
 ```bash
-node bundle/backlog-api.mjs --version
-node bundle/backlog-api.mjs tools list
-node bundle/backlog-api.mjs tools describe get_issue
-node bundle/backlog-api.mjs trace get_issue
-node bundle/backlog-api.mjs call get_issue --input request.json
+node bundle/miku-backlog-api.mjs --version
+node bundle/miku-backlog-api.mjs tools list
+node bundle/miku-backlog-api.mjs tools describe get_issue
+node bundle/miku-backlog-api.mjs trace get_issue
+node bundle/miku-backlog-api.mjs call get_issue --input request.json
 ```
 
 The CLI supports all 62 normal tools registered by the checked upstream
@@ -79,7 +83,7 @@ names, credentials, personal data, and upstream error text are never included.
 Stdout remains machine-readable JSON.
 
 ```text
-verbose: {"type":"backlog-api-access","phase":"success","access":1,"operation":"get_issue","method":"getIssue","permission":"READ","organization":"default","target":{"issueKey":"PROJ-1"},"result":{"issueId":123,"issueKey":"PROJ-1"},"durationMs":184.2}
+verbose: {"type":"miku-backlog-api-access","phase":"success","access":1,"operation":"get_issue","method":"getIssue","permission":"READ","organization":"default","target":{"issueKey":"PROJ-1"},"result":{"issueId":123,"issueKey":"PROJ-1"},"durationMs":184.2}
 ```
 
 `call` permits `READ` operations by default. Enable other client-side CRUD
@@ -101,15 +105,15 @@ account permissions or create a read-only API key.
 
 ```bash
 # No environment setting is needed for read-only use.
-node bundle/backlog-api.mjs call get_issue --input request.json
+node bundle/miku-backlog-api.mjs call get_issue --input request.json
 
 # CREATE must be allowed by both the environment and this call.
 BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE \
-  node bundle/backlog-api.mjs call add_issue --input request.json --allow CREATE
+  node bundle/miku-backlog-api.mjs call add_issue --input request.json --allow CREATE
 
 # DELETE additionally requires destructive-operation confirmation.
 BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE,UPDATE,DELETE \
-  node bundle/backlog-api.mjs call delete_issue --input request.json \
+  node bundle/miku-backlog-api.mjs call delete_issue --input request.json \
   --allow DELETE --confirm-destructive
 ```
 
@@ -125,7 +129,7 @@ configuration, select the connection with the normal top-level
 `organization` input property.
 
 ```bash
-printf '{}\n' | node bundle/backlog-api.mjs call get_rate_limit
+printf '{}\n' | node bundle/miku-backlog-api.mjs call get_rate_limit
 ```
 
 When `--verbose` is enabled, successful and failed API outcome events include
@@ -199,9 +203,9 @@ npm run smoke:node
 
 Generated outputs include:
 
-- `bundle/backlog-api.mjs`
-- `bundle/backlog-api-runtime.mjs`
-- `bundle/backlog-api-sources.tgz`
+- `bundle/miku-backlog-api.mjs`
+- `bundle/miku-backlog-api-runtime.mjs`
+- `bundle/miku-backlog-api-sources.tgz`
 
 Authoritative application sources are TypeScript files under `src/`. The
 compiled `dist/ts/` tree and bundled `.mjs` files are generated artifacts.
@@ -222,7 +226,7 @@ operation, and compatibility records.
 Node-specific planned work is tracked in
 [GitHub Issues](https://github.com/igapyon/backlog-api/issues).
 
-The sister Skill repository pins a released `backlog-api` runtime and records
+The sister Skill repository pins a released `miku-backlog-api` runtime and records
 the Node version and artifact identity separately.
 
 ## License

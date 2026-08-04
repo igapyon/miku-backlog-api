@@ -41,7 +41,7 @@ const operations = listOperations().map((operation) => {
       operation: operation.name,
       toolset: operation.toolset,
       mutationClass: operation.mutationClass,
-      origin: "backlog-api",
+      origin: "miku-backlog-api",
       upstreamSource: null,
       upstreamTest: null,
       targetEntry: "src/core/local-tools.ts",
@@ -73,8 +73,8 @@ const mapping = {
     checked: "2026-07-31"
   },
   target: {
-    repository: "backlog-api",
-    product: "backlog-api",
+    repository: "miku-backlog-api",
+    product: "miku-backlog-api",
     version: productVersion,
     strategy: "published-handler-direct-invocation"
   },

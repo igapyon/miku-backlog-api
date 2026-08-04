@@ -4,16 +4,16 @@ import { execFileSync } from "node:child_process";
 import assert from "node:assert/strict";
 
 for (const args of [["--version"], ["--help"], ["tools", "list"]]) {
-  execFileSync("node", ["bundle/backlog-api.mjs", ...args], {
+  execFileSync("node", ["bundle/miku-backlog-api.mjs", ...args], {
     cwd: process.cwd(),
     encoding: "utf8",
     stdio: ["ignore", "pipe", "inherit"]
   });
 }
 
-const runtime = await import("../bundle/backlog-api-runtime.mjs");
-assert.equal(runtime.product.name, "backlog-api");
-assert.equal(runtime.product.version, "0.6.0");
+const runtime = await import("../bundle/miku-backlog-api-runtime.mjs");
+assert.equal(runtime.product.name, "miku-backlog-api");
+assert.equal(runtime.product.version, "0.7.0");
 assert.equal(runtime.listOperations().length, 63);
 assert.equal(
   runtime.listOperations().find((operation) => operation.name === "get_rate_limit")

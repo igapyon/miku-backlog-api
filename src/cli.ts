@@ -12,15 +12,15 @@ import { runOperation } from "./core/run-operation.js";
 import { formatBacklogAccessEvent } from "./core/verbose-format.js";
 import { product } from "./runtime.js";
 
-const HELP = `backlog-api ${product.version} — JSON CLI for Backlog API operations
+const HELP = `miku-backlog-api ${product.version} — JSON CLI for Backlog API operations
 
 Usage:
-  backlog-api --version
-  backlog-api --help
-  backlog-api tools list
-  backlog-api tools describe <operation>
-  backlog-api trace [operation]
-  backlog-api call <operation> [--input <file|->] [--allow <permissions>]
+  miku-backlog-api --version
+  miku-backlog-api --help
+  miku-backlog-api tools list
+  miku-backlog-api tools describe <operation>
+  miku-backlog-api trace [operation]
+  miku-backlog-api call <operation> [--input <file|->] [--allow <permissions>]
       [--dry-run] [--confirm-destructive] [--verbose]
 
 Commands:
@@ -117,7 +117,7 @@ Environment:
     BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE,UPDATE,DELETE
 
 Rate limits:
-  get_rate_limit is a backlog-api-specific READ operation returning the read,
+  get_rate_limit is a miku-backlog-api-specific READ operation returning the read,
   update, search, and icon limits. Calling it consumes one API request.
   --verbose outcome events include validated X-RateLimit values and an actual
   HTTP status when the Backlog response exposes them.
@@ -134,17 +134,17 @@ Agent discovery:
   4. Only after successful validation, run the call without --dry-run.
 
 Examples:
-  backlog-api tools list
-  backlog-api tools describe get_issue
-  backlog-api call get_issue --help
-  backlog-api trace get_issue
-  printf '{"issueKey":"PROJ-1"}\\n' | backlog-api call get_issue
-  printf '{"issueKey":"PROJ-1","fields":"{ id summary }"}\\n' | backlog-api call get_issue
-  backlog-api call get_issue --input request.json --dry-run
-  backlog-api call get_issue --input request.json --verbose
-  BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE backlog-api call add_issue --input request.json --allow CREATE
-  BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE,UPDATE,DELETE backlog-api call delete_issue --input request.json --allow DELETE --confirm-destructive
-  printf '{}\\n' | BACKLOG_API_ALLOWED_PERMISSIONS=READ backlog-api call get_rate_limit
+  miku-backlog-api tools list
+  miku-backlog-api tools describe get_issue
+  miku-backlog-api call get_issue --help
+  miku-backlog-api trace get_issue
+  printf '{"issueKey":"PROJ-1"}\\n' | miku-backlog-api call get_issue
+  printf '{"issueKey":"PROJ-1","fields":"{ id summary }"}\\n' | miku-backlog-api call get_issue
+  miku-backlog-api call get_issue --input request.json --dry-run
+  miku-backlog-api call get_issue --input request.json --verbose
+  BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE miku-backlog-api call add_issue --input request.json --allow CREATE
+  BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE,UPDATE,DELETE miku-backlog-api call delete_issue --input request.json --allow DELETE --confirm-destructive
+  printf '{}\\n' | BACKLOG_API_ALLOWED_PERMISSIONS=READ miku-backlog-api call get_rate_limit
 `;
 
 main().catch((error) => {

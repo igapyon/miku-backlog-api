@@ -24,7 +24,7 @@ test("all upstream operations have deterministic source and test mappings", () =
   assert.equal(runtimeNames.length, 63);
   assert.deepEqual(mappedNames, runtimeNames);
   const upstreamEntries = mapping.operations.filter((entry) => entry.origin === "upstream");
-  const localEntries = mapping.operations.filter((entry) => entry.origin === "backlog-api");
+  const localEntries = mapping.operations.filter((entry) => entry.origin === "miku-backlog-api");
   assert.equal(upstreamEntries.length, 62);
   assert.deepEqual(localEntries.map((entry) => entry.operation), ["get_rate_limit"]);
   assert.equal(localEntries[0].upstreamSource, null);
@@ -38,7 +38,7 @@ test("all upstream operations have deterministic source and test mappings", () =
 
 test("generated Node runtime excludes upstream MCP and HTTP server modules", () => {
   const meta = JSON.parse(
-    fs.readFileSync(path.resolve(ROOT, "bundle", "backlog-api-meta.json"), "utf8")
+    fs.readFileSync(path.resolve(ROOT, "bundle", "miku-backlog-api-meta.json"), "utf8")
   );
   const inputs = Object.keys(meta.inputs);
 
@@ -315,7 +315,7 @@ test("verbose metadata safely covers representative CRUD operations", async (t) 
       assert.doesNotMatch(lines, /SECRET|description|secretUnknown|"statusId":4/);
       for (const line of lines.split("\n")) {
         const body = JSON.parse(line.slice("verbose: ".length));
-        assert.equal(body.type, "backlog-api-access");
+        assert.equal(body.type, "miku-backlog-api-access");
       }
     });
   }
