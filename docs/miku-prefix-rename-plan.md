@@ -2,11 +2,10 @@
 
 ## Status and Objective
 
-- Status: local main-repository implementation completed and verified on
-  2026-08-04. GitHub repository renames and Release publication remain pending
-  human gates.
+- Status: the main and sister repository migrations, GitHub repository renames,
+  Releases, and cross-repository closure were completed on 2026-08-04.
 - Tracking Issue:
-  [#21](https://github.com/igapyon/backlog-api/issues/21)
+  [#21](https://github.com/igapyon/miku-backlog-api/issues/21)
 - Main repository target:
   `igapyon/backlog-api` -> `igapyon/miku-backlog-api`
 - Sister repository target:
@@ -21,6 +20,27 @@ without an explicit compatibility decision.
 Repository renames, tag creation, GitHub Release publication, and other GitHub
 settings changes are human-owned operations. Local implementation must stop at
 each human gate identified below.
+
+## Main Repository Completion Record
+
+- The main GitHub repository was renamed to
+  `igapyon/miku-backlog-api`; the maintained local `origin` remote uses
+  `git@github.com:igapyon/miku-backlog-api.git`.
+- The `v0.7.0` Release was published from `devel` on 2026-08-04 with the
+  canonical `miku-backlog-api` CLI bundle, runtime bundle, source archive, and
+  `SHA256SUMS` assets. Historical tags, Releases, and assets remain unchanged.
+- The sister repository was renamed to `igapyon/miku-backlog-api-skills` and
+  published Release `v0.7.3`. Its released bundle installs
+  `skills/igapyon-miku-backlog-api/` and pins the main `v0.7.0` runtime with
+  its published SHA-256.
+- Old main and sister repository URLs redirect to their canonical URLs, and
+  the old product, repository, and installed Skill names remain compatibility
+  triggers.
+- The main and sister default-branch CI workflows and both Release workflows
+  completed successfully. Issue #21 records the migration completion and is
+  closed.
+- Product work tracked separately in Issues #4, #5, and #20 is outside this
+  rename plan and remains open.
 
 ## Planned Name Map
 
