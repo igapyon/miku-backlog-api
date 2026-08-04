@@ -26,7 +26,7 @@ export interface Diagnostic {
 }
 
 export interface UpstreamTrace {
-  origin: "upstream" | "backlog-api";
+  origin: "upstream" | "miku-backlog-api";
   repository: string;
   version: string;
   commit?: string;

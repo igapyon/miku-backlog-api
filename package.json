@@ -1,9 +1,10 @@
 {
-  "name": "backlog-api",
-  "version": "0.6.0",
+  "name": "miku-backlog-api",
+  "version": "0.7.0",
   "private": true,
   "type": "module",
   "bin": {
+    "miku-backlog-api": "dist/cli.mjs",
     "backlog-api": "dist/cli.mjs"
   },
   "engines": {

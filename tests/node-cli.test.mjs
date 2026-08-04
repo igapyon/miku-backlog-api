@@ -1,19 +1,30 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
 import test from "node:test";
 
-const CLI = "bundle/backlog-api.mjs";
+const CLI = "bundle/miku-backlog-api.mjs";
+
+test("package exposes the canonical and compatibility CLI names", () => {
+  const packageJson = JSON.parse(
+    fs.readFileSync(path.resolve(process.cwd(), "package.json"), "utf8")
+  );
+
+  assert.equal(packageJson.bin["miku-backlog-api"], "dist/cli.mjs");
+  assert.equal(packageJson.bin["backlog-api"], "dist/cli.mjs");
+});
 
 test("CLI metadata commands do not require credentials", () => {
   const version = run(["--version"]);
   assert.equal(version.status, 0);
-  assert.equal(version.stdout, "0.6.0\n");
+  assert.equal(version.stdout, "0.7.0\n");
   assert.equal(version.stderr, "");
 
   const help = run(["--help"]);
   assert.equal(help.status, 0);
   assert.equal(help.stderr, "");
-  assert.match(help.stdout, /backlog-api call <operation>/);
+  assert.match(help.stdout, /miku-backlog-api call <operation>/);
   assert.match(help.stdout, /tools describe <operation>/);
   assert.match(help.stdout, /Agent discovery:/);
   assert.match(help.stdout, /machine-readable JSON to stdout/);
@@ -29,10 +40,12 @@ test("CLI metadata commands do not require credentials", () => {
   assert.match(help.stdout, /Unknown options, duplicate options/);
   assert.doesNotMatch(
     help.stdout,
-    /^\s*backlog-api call delete_issue .*--allow DELETE/m
+    /^\s*miku-backlog-api call delete_issue .*--allow DELETE/m
   );
 
   const catalog = JSON.parse(run(["tools", "list"]).stdout);
+  assert.equal(catalog.product.name, "miku-backlog-api");
+  assert.equal(catalog.product.version, "0.7.0");
   assert.equal(catalog.operations.length, 63);
   assert.equal(
     catalog.operations.find((operation) => operation.name === "get_issue").requiredPermission,

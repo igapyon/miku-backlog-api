@@ -13,8 +13,8 @@ const rateLimitBucketSchema = z.object({
 export function createLocalToolset(backlog: object) {
   const client = backlog as LocalBacklogClient;
   return {
-    name: "backlog-api",
-    description: "Operations provided directly by the backlog-api Node runtime.",
+    name: "miku-backlog-api",
+    description: "Operations provided directly by the miku-backlog-api Node runtime.",
     enabled: false,
     tools: [
       {
