@@ -3,7 +3,7 @@
 ## Initial Design Record
 
 - checked date: 2026-07-22
-- repository version: `0.7.0`
+- repository version: `0.7.1`
 - implementation maturity: beta standalone Node Core/CLI
 - split source: `backlog-api-skills` initial combined implementation
 
