@@ -15,7 +15,7 @@ confirmation guards for destructive operations.
 
 Agent workflows, working context, user-facing authorization policy, and
 integrations belong to the sister
-[`backlog-api-skills`](https://github.com/igapyon/backlog-api-skills)
+[`miku-backlog-api-skills`](https://github.com/igapyon/miku-backlog-api-skills)
 repository.
 
 ## Node CLI
