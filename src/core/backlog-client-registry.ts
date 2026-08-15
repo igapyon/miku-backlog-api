@@ -1,6 +1,6 @@
 import { Backlog } from "backlog-js";
 import { product } from "../product.js";
-import type { BacklogClientRegistry } from "./contracts.js";
+import type { BacklogClientRegistry, BacklogOrganization } from "./contracts.js";
 import { createBacklogCapturingFetch } from "./backlog-access-context.js";
 
 const USER_AGENT = `${product.name}/${product.version}`;
@@ -41,6 +41,9 @@ export function createBacklogClientRegistry(
         throw new Error(`Unknown organization '${organization}'.`);
       }
       return client;
+    },
+    listOrganizations() {
+      return [{ name: "default", domain, isDefault: true }];
     }
   };
 }
@@ -97,8 +100,14 @@ function createMultiOrganizationRegistry(
   }
 
   const clients = new Map<string, Backlog>();
+  const organizationInfo: BacklogOrganization[] = [];
   for (const [organization, config] of organizations) {
     clients.set(organization, createClient(config.domain!, config.apiKey!, fetch));
+    organizationInfo.push({
+      name: organization,
+      domain: config.domain!,
+      isDefault: organization === defaultOrganization
+    });
   }
   if (!clients.has(defaultOrganization)) {
     throw new Error(
@@ -114,8 +123,15 @@ function createMultiOrganizationRegistry(
         throw new Error(`Unknown organization '${selected}'.`);
       }
       return client;
+    },
+    listOrganizations() {
+      return organizationInfo.slice().sort(compareOrganizationNames);
     }
   };
+}
+
+function compareOrganizationNames(left: BacklogOrganization, right: BacklogOrganization): number {
+  return left.name < right.name ? -1 : left.name > right.name ? 1 : 0;
 }
 
 function createClient(

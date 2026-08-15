@@ -46,7 +46,7 @@ test("CLI metadata commands do not require credentials", () => {
   const catalog = JSON.parse(run(["tools", "list"]).stdout);
   assert.equal(catalog.product.name, "miku-backlog-api");
   assert.equal(catalog.product.version, "0.7.1");
-  assert.equal(catalog.operations.length, 63);
+  assert.equal(catalog.operations.length, 65);
   assert.equal(
     catalog.operations.find((operation) => operation.name === "get_issue").requiredPermission,
     "READ"
@@ -57,6 +57,16 @@ test("CLI metadata commands do not require credentials", () => {
   );
   assert.equal(
     catalog.operations.find((operation) => operation.name === "get_rate_limit").requiredPermission,
+    "READ"
+  );
+  assert.equal(
+    catalog.operations.find((operation) => operation.name === "get_project_statuses")
+      .requiredPermission,
+    "READ"
+  );
+  assert.equal(
+    catalog.operations.find((operation) => operation.name === "list_organizations")
+      .requiredPermission,
     "READ"
   );
   assert.equal(
@@ -127,6 +137,25 @@ test("CLI metadata commands do not require credentials", () => {
     localDescription.operation.outputFieldSchema.properties.rateLimit.type,
     "object"
   );
+
+  const projectStatusesDescription = JSON.parse(
+    run(["tools", "describe", "get_project_statuses"]).stdout
+  );
+  assert.equal(projectStatusesDescription.operation.requiredPermission, "READ");
+  assert.equal(projectStatusesDescription.operation.inputSchema.properties.projectId.type, "number");
+  assert.equal(projectStatusesDescription.operation.inputSchema.properties.projectKey.type, "string");
+  assert.deepEqual(projectStatusesDescription.operation.inputSchema.allOf[0].anyOf, [
+    { required: ["projectId"] },
+    { required: ["projectKey"] }
+  ]);
+  assert.equal(projectStatusesDescription.operation.outputFieldSchema.type, "array");
+
+  const organizationsDescription = JSON.parse(
+    run(["tools", "describe", "list_organizations"]).stdout
+  );
+  assert.equal(organizationsDescription.operation.requiredPermission, "READ");
+  assert.equal(organizationsDescription.operation.outputFieldSchema.type, "array");
+  assert.deepEqual(organizationsDescription.operation.examples, [{}]);
 });
 
 test("CLI dry-run validates complete input without Backlog credentials", () => {
@@ -140,7 +169,8 @@ test("CLI dry-run validates complete input without Backlog credentials", () => {
   for (const [operation, path] of [
     ["get_issue", "issueId|issueKey"],
     ["get_related_issues", "issueId|issueKey"],
-    ["get_project", "projectId|projectKey"]
+    ["get_project", "projectId|projectKey"],
+    ["get_project_statuses", "projectId|projectKey"]
   ]) {
     const invalid = run(["call", operation, "--input", "-", "--dry-run"], "{}");
     assert.equal(invalid.status, 2);
@@ -164,6 +194,13 @@ test("CLI dry-run validates complete input without Backlog credentials", () => {
   );
   assert.equal(updateComment.status, 0);
   assert.equal(JSON.parse(updateComment.stdout).dryRun, true);
+
+  const organizationDiscovery = run(
+    ["call", "list_organizations", "--input", "-", "--dry-run"],
+    "{}"
+  );
+  assert.equal(organizationDiscovery.status, 0);
+  assert.equal(JSON.parse(organizationDiscovery.stdout).dryRun, true);
 });
 
 test("CLI allows READ only by default and checks permissions before credentials", () => {

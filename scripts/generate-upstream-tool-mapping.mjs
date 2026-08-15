@@ -14,6 +14,21 @@ const productVersion = JSON.parse(
   fs.readFileSync(path.resolve(root, "package.json"), "utf8")
 ).version;
 
+const LOCAL_OPERATION_MAPPINGS = new Map([
+  ["list_organizations", {
+    targetEntry: "src/core/local-tools.ts",
+    targetTest: "tests/access-policy-and-rate-limit.test.mjs"
+  }],
+  ["get_project_statuses", {
+    targetEntry: "src/core/local-tools.ts",
+    targetTest: "tests/access-policy-and-rate-limit.test.mjs"
+  }],
+  ["get_rate_limit", {
+    targetEntry: "src/core/local-tools.ts",
+    targetTest: "tests/access-policy-and-rate-limit.test.mjs"
+  }]
+]);
+
 if (!fs.existsSync(upstreamToolsRoot)) {
   throw new Error(`missing upstream checkout: ${upstreamToolsRoot}`);
 }
@@ -32,11 +47,8 @@ for (const filename of fs.readdirSync(upstreamToolsRoot).sort(compareUtf16)) {
 }
 
 const operations = listOperations().map((operation) => {
-  const upstreamSource = sourceByOperation.get(operation.name);
-  if (!upstreamSource) {
-    if (operation.name !== "get_rate_limit") {
-      throw new Error(`no upstream source mapping for operation: ${operation.name}`);
-    }
+  const localMapping = LOCAL_OPERATION_MAPPINGS.get(operation.name);
+  if (localMapping !== undefined) {
     return {
       operation: operation.name,
       toolset: operation.toolset,
@@ -44,9 +56,12 @@ const operations = listOperations().map((operation) => {
       origin: "miku-backlog-api",
       upstreamSource: null,
       upstreamTest: null,
-      targetEntry: "src/core/local-tools.ts",
-      targetTest: "tests/access-policy-and-rate-limit.test.mjs"
+      ...localMapping
     };
+  }
+  const upstreamSource = sourceByOperation.get(operation.name);
+  if (!upstreamSource) {
+    throw new Error(`no upstream or local source mapping for operation: ${operation.name}`);
   }
   const upstreamTest = upstreamSource.replace(/\.ts$/, ".test.ts");
   return {

@@ -37,6 +37,13 @@ export interface UpstreamTrace {
 
 export interface BacklogClientRegistry {
   resolveClient(organization?: string): object;
+  listOrganizations(): readonly BacklogOrganization[];
+}
+
+export interface BacklogOrganization {
+  name: string;
+  domain: string;
+  isDefault: boolean;
 }
 
 export type BacklogAccessPhase = "start" | "success" | "failure";

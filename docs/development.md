@@ -39,8 +39,9 @@ This repository owns:
 - JSON envelopes and CLI exit behavior
 - dry-run and destructive-operation guards
 - environment-level CRUD permission allow-list
-- response-scoped rate-limit metadata and the Node-specific `get_rate_limit`
-  operation
+- response-scoped rate-limit metadata and the Node-specific
+  `get_project_statuses`, `get_rate_limit`, and `list_organizations`
+  operations
 - upstream source, test, and operation traceability
 - Node build, tests, runtime artifacts, and releases
 
@@ -51,7 +52,15 @@ cross-product integrations.
 ## Adopted Decisions
 
 - preserve every upstream normal tool name as one Node operation
-- expose `get_rate_limit` as a clearly identified Node-specific operation
+- expose `get_project_statuses`, `get_rate_limit`, and `list_organizations` as
+  clearly identified Node-specific operations
+- derive a terminal Closed status only from the greatest `displayOrder`; do not
+  use localized status names, colors, or fixed IDs
+- keep organization discovery local: validate configuration, return only
+  non-secret metadata, and make no Backlog API call
+- retain the supported `backlog-mcp-server` published-handler dependency until
+  an upstream transport-free boundary exists or a separately reviewed local
+  conversion proves differential parity
 - use one generic, tested operation runner instead of duplicating 62 handlers
 - generate and commit an upstream tool mapping
 - bundle CLI and importable runtime artifacts separately

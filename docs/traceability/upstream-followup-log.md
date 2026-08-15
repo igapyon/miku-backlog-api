@@ -1,5 +1,24 @@
 # Upstream Follow-Up Log
 
+## 2026-08-15 — Local Open-Issue Contracts
+
+- re-ran the representative upstream differential suite for Issue #26; no
+  redundant source change was required
+- added product-owned READ operation `get_project_statuses` for Issue #20,
+  including project ID/key validation, `fields` projection, and direct
+  `getProjectStatuses` invocation
+- documented the downstream terminal-status rule: use the unique greatest
+  `displayOrder`, not a status name, color, or fixed ID
+- added product-owned READ operation `list_organizations` for Issue #4; it
+  validates local configuration and exposes only sorted `name`, `domain`, and
+  `isDefault` metadata without a Backlog API call
+- generalized local-operation trace mapping; the generated inventory is now
+  62 upstream operations plus three local operations
+- retained `backlog-mcp-server@0.14.0` as the supported handler boundary for
+  Issue #5. Its published package exposes `build/` and declares its transport
+  dependencies; no local conversion or upstream-version refresh is included in
+  this change.
+
 ## 2026-07-31 — v0.14.0 Compatibility Refresh
 
 - pinned npm packages `backlog-mcp-server@0.14.0` and `backlog-js@0.19.0`

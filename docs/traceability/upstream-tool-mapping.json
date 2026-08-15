@@ -335,6 +335,16 @@
       "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
+      "operation": "get_project_statuses",
+      "toolset": "miku-backlog-api",
+      "mutationClass": "read",
+      "origin": "miku-backlog-api",
+      "upstreamSource": null,
+      "upstreamTest": null,
+      "targetEntry": "src/core/local-tools.ts",
+      "targetTest": "tests/access-policy-and-rate-limit.test.mjs"
+    },
+    {
       "operation": "get_project_users",
       "toolset": "project",
       "mutationClass": "read",
@@ -523,6 +533,16 @@
       "upstreamTest": "src/tools/getWikisCount.test.ts",
       "targetEntry": "src/core/run-operation.ts",
       "targetTest": "tests/upstream-differential.test.mjs"
+    },
+    {
+      "operation": "list_organizations",
+      "toolset": "miku-backlog-api",
+      "mutationClass": "read",
+      "origin": "miku-backlog-api",
+      "upstreamSource": null,
+      "upstreamTest": null,
+      "targetEntry": "src/core/local-tools.ts",
+      "targetTest": "tests/access-policy-and-rate-limit.test.mjs"
     },
     {
       "operation": "mark_notification_as_read",

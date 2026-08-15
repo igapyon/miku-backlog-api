@@ -23,7 +23,9 @@ Target test layers:
   - JSON stdout and exit-code behavior
 - `tests/access-policy-and-rate-limit.test.mjs`
   - environment CRUD permission parsing and enforcement
-  - Node-specific `get_rate_limit`
+  - Node-specific `get_project_statuses`, `get_rate_limit`, and
+    `list_organizations`
+  - local-operation input, fields, trace, organization, and no-secret guards
   - rate-limit response-header validation
   - parallel access-context isolation
   - representative CRUD response metadata

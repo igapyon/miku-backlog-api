@@ -1,6 +1,6 @@
 import { allTools } from "backlog-mcp-server/build/tools/tools.js";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import type { CrudPermission, MutationClass } from "./contracts.js";
+import type { BacklogClientRegistry, CrudPermission, MutationClass } from "./contracts.js";
 import { createLocalToolset } from "./local-tools.js";
 import { getAlternativeFieldConstraints } from "./operation-input-constraints.js";
 
@@ -30,6 +30,7 @@ const OPERATION_POLICIES = new Map<string, OperationPolicy>([
     "get_priorities",
     "get_project",
     "get_project_list",
+    "get_project_statuses",
     "get_project_users",
     "get_pull_request",
     "get_pull_request_comments",
@@ -47,7 +48,8 @@ const OPERATION_POLICIES = new Map<string, OperationPolicy>([
     "get_watching_list_items",
     "get_wiki",
     "get_wiki_pages",
-    "get_wikis_count"
+    "get_wikis_count",
+    "list_organizations"
   ], "read", "READ"),
   ...policyEntries([
     "addDocument",
@@ -104,10 +106,15 @@ const metadataOnlyClient = new Proxy({}, {
   }
 });
 
-export function createToolsets(backlog: object = metadataOnlyClient) {
+export function createToolsets(
+  backlog: object = metadataOnlyClient,
+  localRegistry?: BacklogClientRegistry
+) {
   return [
     ...allTools(backlog, fallbackTranslation).toolsets,
-    createLocalToolset(backlog)
+    createLocalToolset(backlog, {
+      ...(localRegistry === undefined ? {} : { registry: localRegistry })
+    })
   ];
 }
 
@@ -164,8 +171,12 @@ export function hasOperation(operationName: string): boolean {
   );
 }
 
-export function resolveTool(backlog: object, operationName: string) {
-  for (const toolset of createToolsets(backlog)) {
+export function resolveTool(
+  backlog: object,
+  operationName: string,
+  localRegistry?: BacklogClientRegistry
+) {
+  for (const toolset of createToolsets(backlog, localRegistry)) {
     const tool = toolset.tools.find((candidate) => candidate.name === operationName);
     if (tool) {
       return { tool, toolset: toolset.name };
@@ -208,9 +219,11 @@ function compareUtf16(left: string, right: string): number {
 type JsonObject = Record<string, unknown>;
 
 const OPERATION_EXAMPLES = new Map<string, readonly JsonObject[]>([
+  ["list_organizations", [{}]],
   ["get_issue", [{ issueKey: "PROJ-1" }, { issueId: 12345 }]],
   ["get_related_issues", [{ issueKey: "PROJ-1" }, { issueId: 12345 }]],
   ["get_project", [{ projectKey: "PROJ" }, { projectId: 12345 }]],
+  ["get_project_statuses", [{ projectKey: "PROJ" }, { projectId: 12345 }]],
   ["get_rate_limit", [{}]],
   [
     "add_issue",

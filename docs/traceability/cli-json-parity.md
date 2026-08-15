@@ -75,8 +75,12 @@ use the same envelope with `success: false` and error diagnostics.
   identifiers when supplied
 - content values, full request/response data, organization names, credentials,
 personal data, and upstream error text are omitted from verbose events
-- `get_rate_limit` is a Node-specific READ operation, not an upstream normal
-  tool
+- `get_project_statuses`, `get_rate_limit`, and `list_organizations` are
+  Node-specific READ operations, not upstream normal tools
+- `get_project_statuses` applies the Node project ID/key validation before
+  resolving a client; it otherwise calls the Backlog status-list endpoint
+- `list_organizations` validates local configuration and returns non-secret
+  metadata without selecting a client or emitting a Backlog access event
 
 Stdout is reserved for metadata or result JSON except `--help` and `--version`.
 Unexpected CLI failures go to stderr.
