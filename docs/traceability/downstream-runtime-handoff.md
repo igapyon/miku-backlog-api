@@ -5,12 +5,17 @@
 - upstream package: `backlog-mcp-server@0.14.0`
 - upstream tag: `v0.14.0`
 - upstream commit: `9da42fcfb5b69f1455e3864c49f2b57a45a4cbe9`
-- current package version: `0.7.1`
+- current package version: `0.7.6`
 - normal upstream operations: 62
-- Node-specific operations: `get_rate_limit`
+- Node-specific operations: `get_project_statuses`, `get_rate_limit`, and
+  `list_organizations`
 
 ## Runtime Changes for the Sister Agent Skill
 
+- added `get_project_statuses` (READ), with project ID/key resolution and the
+  terminal Closed-status rule based solely on greatest `displayOrder`
+- added `list_organizations` (READ), which returns non-secret validated local
+  configuration metadata without making a Backlog API call
 - added `get_related_issues` (READ)
 - added `add_related_issue` (CREATE)
 - added `update_issue_comment` (UPDATE)
