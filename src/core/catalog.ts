@@ -1,4 +1,4 @@
-import { allTools } from "backlog-mcp-server/build/tools/tools.js";
+import { allTools } from "backlog-mcp-server";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import type { BacklogClientRegistry, CrudPermission, MutationClass } from "./contracts.js";
 import { createLocalToolset } from "./local-tools.js";
@@ -111,7 +111,7 @@ export function createToolsets(
   localRegistry?: BacklogClientRegistry
 ) {
   return [
-    ...allTools(backlog, fallbackTranslation).toolsets,
+    ...allTools(backlog as Parameters<typeof allTools>[0], fallbackTranslation).toolsets,
     createLocalToolset(backlog, {
       ...(localRegistry === undefined ? {} : { registry: localRegistry })
     })
@@ -142,9 +142,7 @@ export function describeOperation(operationName: string) {
     toJsonSchema(resolved.tool.schema),
     operationName
   );
-  const outputSchema = resolved.tool.outputSchema === undefined
-    ? undefined
-    : toJsonSchema(resolved.tool.outputSchema);
+  const outputSchema = outputFieldSchema(resolved.tool);
   const examples = OPERATION_EXAMPLES.get(operationName);
   return {
     name: resolved.tool.name,
@@ -244,10 +242,46 @@ const OPERATION_EXAMPLES = new Map<string, readonly JsonObject[]>([
 ]);
 
 function toJsonSchema(schema: unknown): JsonObject {
+  if (hasToJsonSchema(schema)) {
+    return schema.toJSONSchema();
+  }
   return zodToJsonSchema(
     schema as Parameters<typeof zodToJsonSchema>[0],
     { target: "jsonSchema7" }
   ) as JsonObject;
+}
+
+function outputFieldSchema(tool: object): JsonObject | undefined {
+  if (hasOutputSchema(tool)) {
+    return toJsonSchema(tool.outputSchema);
+  }
+  if (!hasOutputFields(tool)) {
+    return undefined;
+  }
+  const objectSchema: JsonObject = {
+    type: "object",
+    properties: Object.fromEntries(tool.outputFields.map((field) => [String(field), true])),
+    additionalProperties: true
+  };
+  return tool.returnsList === true
+    ? { type: "array", items: objectSchema }
+    : objectSchema;
+}
+
+function hasToJsonSchema(value: unknown): value is { toJSONSchema(): JsonObject } {
+  return typeof value === "object" && value !== null &&
+    "toJSONSchema" in value && typeof value.toJSONSchema === "function";
+}
+
+function hasOutputSchema(value: object): value is { outputSchema: unknown } {
+  return "outputSchema" in value && value.outputSchema !== undefined;
+}
+
+function hasOutputFields(
+  value: object
+): value is { outputFields: readonly PropertyKey[]; returnsList: boolean } {
+  return "outputFields" in value && Array.isArray(value.outputFields) &&
+    "returnsList" in value && typeof value.returnsList === "boolean";
 }
 
 function addCliInputMetadata(

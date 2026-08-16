@@ -12,9 +12,7 @@
 
 ## Pending Evaluation
 
-- GraphQL-style field selection parity
 - token-limit parity
-- organization discovery meta-operation
 - broader differential output tests against MCP-composed handlers
 - optional MCP fallback policy; not enabled in the Node CLI
 

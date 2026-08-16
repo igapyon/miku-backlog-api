@@ -17,7 +17,7 @@ Target test layers:
     handler and the Node operation runner
   - API-call argument, result-data, organization-selection, and Backlog-error
     message parity
-  - GraphQL-style field-selection parity
+  - upstream v0.18.0 field-selection difference and retained Node contract
 - `tests/node-cli.test.mjs`
   - metadata commands
   - JSON stdout and exit-code behavior
@@ -33,7 +33,7 @@ Target test layers:
   - generated CLI metadata commands and importable runtime startup
 
 The differential suite unwraps the upstream MCP text content and compares its
-data with the Node JSON envelope. Field selection is compared explicitly. MCP
-content blocks, token truncation, and Node-only permission, dry-run,
-confirmation, diagnostics, and trace fields remain intentional surface
-differences.
+data with the Node JSON envelope. It separately verifies the intentional
+field-selection difference. MCP content blocks, token truncation, and Node-only
+permission, dry-run, confirmation, diagnostics, and trace fields remain
+intentional surface differences.

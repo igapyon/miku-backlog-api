@@ -8,7 +8,7 @@ Each upstream normal tool is represented as one mapping row with
 
 ```text
 upstream src/tools/<tool>.ts
-  -> published backlog-mcp-server/build/tools/<tool>.js
+  -> published backlog-mcp-server public allTools catalog
   -> src/core/run-operation.ts operation selected by original tool name
   -> bundle/miku-backlog-api.mjs call <operation>
 ```

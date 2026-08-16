@@ -19,16 +19,16 @@
 ## Upstream Anchor
 
 - repository: <https://github.com/nulab/backlog-mcp-server>
-- compatibility version: `v0.14.0`
-- checked commit: `9da42fcfb5b69f1455e3864c49f2b57a45a4cbe9`
-- npm package: `backlog-mcp-server@0.14.0`
+- compatibility version: `v0.18.0`
+- checked commit: `1ca465a97d4ec09b96c7b4bece5135004454d2b8`
+- npm package: `backlog-mcp-server@0.18.0`
 - upstream license: MIT
 - disposable checkout: `workplace/upstream/backlog-mcp-server`
 
-The runtime imports the published handler modules, validates their original
-Zod schemas, and invokes their handlers directly. MCP stdio/HTTP transport,
-resources, prompts, OAuth HTTP middleware, and dynamic toolset registration are
-not part of this Node CLI runtime.
+The runtime imports the published root library API, validates the original Zod
+schemas, and invokes handlers directly. MCP stdio/HTTP transport, resources,
+prompts, OAuth HTTP middleware, and server-side tool registration are not part
+of this Node CLI runtime.
 
 ## Repository Boundary
 
@@ -61,6 +61,10 @@ cross-product integrations.
 - retain the supported `backlog-mcp-server` published-handler dependency until
   an upstream transport-free boundary exists or a separately reviewed local
   conversion proves differential parity
+- consume only the upstream package's public root exports; do not rely on
+  unexported `build/` subpaths
+- retain the Node CLI's nested GraphQL-style `fields` contract as a local
+  compatibility layer because v0.18.0 exposes list-only field arrays
 - use one generic, tested operation runner instead of duplicating 62 handlers
 - generate and commit an upstream tool mapping
 - bundle CLI and importable runtime artifacts separately

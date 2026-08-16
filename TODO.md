@@ -2,6 +2,11 @@
 
 ## Open Issue Execution
 
+- [x] Implement the local compatibility update for
+      [Issue #28](https://github.com/igapyon/miku-backlog-api/issues/28): pin
+      `backlog-mcp-server@0.18.0`, regenerate the mapping from its exact tag,
+      preserve the documented Node `fields` contract, and verify the supported
+      public import boundary.
 - [x] Execute and verify the local work recorded in
       [`docs/open-issue-implementation-plan.md`](docs/open-issue-implementation-plan.md).
 - [x] Verify the already-present differential coverage for
@@ -14,7 +19,7 @@
 - [x] Record the accepted dependency-boundary exception for
       [Issue #5](https://github.com/igapyon/miku-backlog-api/issues/5).
 - [ ] In a separately approved SCM action, review the diff, prepare evidence
-      comments, and update or close the GitHub Issues. Do not make that
+      comments, and update or close the GitHub Issues, including #28. Do not make that
       external change from this local implementation task.
 
 ## `miku-` Prefix Rename

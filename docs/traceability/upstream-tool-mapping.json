@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "upstream": {
     "repository": "https://github.com/nulab/backlog-mcp-server",
-    "version": "0.14.0",
-    "tag": "v0.14.0",
-    "commit": "9da42fcfb5b69f1455e3864c49f2b57a45a4cbe9",
-    "checked": "2026-07-31"
+    "version": "0.18.0",
+    "tag": "v0.18.0",
+    "commit": "1ca465a97d4ec09b96c7b4bece5135004454d2b8",
+    "checked": "2026-08-16"
   },
   "target": {
     "repository": "miku-backlog-api",
