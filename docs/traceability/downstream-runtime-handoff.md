@@ -2,9 +2,9 @@
 
 ## Compatibility Baseline
 
-- upstream package: `backlog-mcp-server@0.14.0`
-- upstream tag: `v0.14.0`
-- upstream commit: `9da42fcfb5b69f1455e3864c49f2b57a45a4cbe9`
+- upstream package: `backlog-mcp-server@0.18.0`
+- upstream tag: `v0.18.0`
+- upstream commit: `1ca465a97d4ec09b96c7b4bece5135004454d2b8`
 - current package version: `0.7.7`
 - normal upstream operations: 62
 - Node-specific operations: `get_project_statuses`, `get_rate_limit`, and
@@ -22,6 +22,9 @@
 - added `remove_related_issue` (DELETE and destructive confirmation)
 - preserved `update_issue.parentIssueId`
 - preserved fallback from non-positive `issueId` to `issueKey`
+- replaced unexported upstream module imports with the public root library API
+- retained nested GraphQL-style Node `fields`; upstream v0.18.0 now exposes
+  list-only field arrays and untyped output field names
 
 The Node runtime continues to require the environment permission ceiling and
 call-level `--allow` for every write. `remove_related_issue` also requires
@@ -38,7 +41,7 @@ chosen, rebuild from a clean worktree and provide all of the following:
 3. `bundle/miku-backlog-api-runtime.mjs`
 4. `bundle/miku-backlog-api-sources.tgz`
 5. SHA-256 values calculated from those clean-build artifacts
-6. the v0.14.0 compatibility and safety delta above
+6. the v0.18.0 compatibility and safety delta above
 
 Run `npm run typecheck`, `npm run trace:refresh`, `npm test`, and
 `npm run smoke:node` before recording the runtime identity in

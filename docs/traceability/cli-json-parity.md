@@ -9,14 +9,16 @@
 - upstream Backlog error parsing
 - upstream source and test identity in trace metadata
 
-## v0.14.0 Upstream Delta
+## v0.18.0 Upstream Delta
 
-- `update_issue_comment` is exposed as an UPDATE operation.
-- `get_related_issues`, `add_related_issue`, and `remove_related_issue` are
-  exposed as READ, CREATE, and destructive DELETE operations respectively.
-- `update_issue` preserves the upstream optional `parentIssueId` input.
-- Issue handlers use `issueKey` when both identifiers are supplied and
-  `issueId` is non-positive, matching the upstream resolver.
+- The published package exposes only its root library entry point. The Node
+  runtime imports its public `allTools` and `backlogErrorHandler` exports rather
+  than unexported `build/` subpaths.
+- Dynamic toolsets are removed from the upstream MCP server.
+- Upstream field selection is a list-only array on list-returning tools, and
+  upstream output metadata identifies field names without output value types.
+- `update_issue_comment`, related-Issue operations, optional `parentIssueId`,
+  and non-positive Issue-ID fallback remain covered by the converted contract.
 
 The Node policy layer adds the same issue ID/key alternative validation to the
 new issue operations. `remove_related_issue` is a DELETE operation and therefore
@@ -51,9 +53,10 @@ use the same envelope with `success: false` and error diagnostics.
 
 - no MCP content blocks or protocol transport
 - no MCP dynamic-toolset calls
-- GraphQL-style `fields` selection is accepted as a top-level input property
-- `tools describe <operation>` exposes the input and result-field schemas as
-  credential-free JSON for agent discovery
+- nested GraphQL-style `fields` selection is retained as a Node top-level input
+  property; it is no longer an upstream MCP parity feature
+- `tools describe <operation>` exposes credential-free input JSON Schema and a
+  result-field availability schema; upstream v0.18.0 field names are untyped
 - handler-level ID/key and ID/name alternatives are validated before dry-run
   succeeds
 - dry-run validates without resolving a Backlog connection
@@ -94,7 +97,9 @@ organization, mock Backlog API call arguments, and parsed Backlog error
 messages.
 
 The comparison intentionally normalizes away MCP content blocks and the Node
-JSON envelope. GraphQL-style field selection is covered by a dedicated parity
-case. MCP token truncation remains excluded. Node CRUD permissions, dry-run,
-verbose access events, destructive confirmation, diagnostics, and trace metadata are Node-only
-behavior and are tested separately.
+JSON envelope. A dedicated test records the intentional field-selection
+difference: the Node CLI retains nested GraphQL-style selection while upstream
+v0.18.0 exposes list-only field arrays. MCP token truncation remains excluded.
+Node CRUD permissions, dry-run, verbose access events, destructive
+confirmation, diagnostics, and trace metadata are Node-only behavior and are
+tested separately.

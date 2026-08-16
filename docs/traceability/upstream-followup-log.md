@@ -1,5 +1,17 @@
 # Upstream Follow-Up Log
 
+## 2026-08-16 — v0.18.0 Compatibility Refresh
+
+- pinned `backlog-mcp-server@0.18.0` and checked upstream tag `v0.18.0` at
+  commit `1ca465a97d4ec09b96c7b4bece5135004454d2b8`
+- regenerated the mapping against the exact upstream checkout and retained the
+  62 upstream-operation / three local-operation inventory
+- replaced deep `build/` imports with the package's supported root library API
+- retained nested GraphQL-style `fields` as a Node-only compatibility layer;
+  v0.18.0 exposes list-only field arrays and untyped output field names
+- verified representative CRUD handler parity, root-import resolution, and
+  exclusion of MCP and HTTP server modules from generated Node bundles
+
 ## 2026-08-15 — Local Open-Issue Contracts
 
 - re-ran the representative upstream differential suite for Issue #26; no

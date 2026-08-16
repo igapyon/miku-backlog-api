@@ -1,15 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { backlogErrorHandler } from "backlog-mcp-server/build/backlog/backlogErrorHandler.js";
-import { composeToolHandler } from "backlog-mcp-server/build/handlers/builders/composeToolHandler.js";
-import { addIssueTool } from "backlog-mcp-server/build/tools/addIssue.js";
-import { addRelatedIssueTool } from "backlog-mcp-server/build/tools/addRelatedIssue.js";
-import { deleteIssueTool } from "backlog-mcp-server/build/tools/deleteIssue.js";
-import { getIssueTool } from "backlog-mcp-server/build/tools/getIssue.js";
-import { getRelatedIssuesTool } from "backlog-mcp-server/build/tools/getRelatedIssues.js";
-import { removeRelatedIssueTool } from "backlog-mcp-server/build/tools/removeRelatedIssue.js";
-import { updateIssueTool } from "backlog-mcp-server/build/tools/updateIssue.js";
-import { updateIssueCommentTool } from "backlog-mcp-server/build/tools/updateIssueComment.js";
+import { allTools, backlogErrorHandler, composeToolHandler } from "backlog-mcp-server";
 import { runOperation } from "../dist/ts/core/run-operation.js";
 
 const translation = {
@@ -26,7 +17,6 @@ const cases = [
     operation: "get_issue",
     permission: "READ",
     method: "getIssue",
-    factory: getIssueTool,
     input: { organization: "TEST", issueKey: "TEST-1" },
     response: { id: 1, issueKey: "TEST-1", summary: "read fixture" }
   },
@@ -34,7 +24,6 @@ const cases = [
     operation: "add_issue",
     permission: "CREATE",
     method: "postIssue",
-    factory: addIssueTool,
     input: {
       organization: "TEST",
       projectId: 10,
@@ -50,7 +39,6 @@ const cases = [
     operation: "update_issue",
     permission: "UPDATE",
     method: "patchIssue",
-    factory: updateIssueTool,
     input: {
       organization: "TEST",
       issueKey: "TEST-3",
@@ -64,7 +52,6 @@ const cases = [
     operation: "delete_issue",
     permission: "DELETE",
     method: "deleteIssue",
-    factory: deleteIssueTool,
     input: { organization: "TEST", issueKey: "TEST-4" },
     response: { id: 4, issueKey: "TEST-4", summary: "deleted fixture" }
   },
@@ -72,7 +59,6 @@ const cases = [
     operation: "get_related_issues",
     permission: "READ",
     method: "getRelatedIssues",
-    factory: getRelatedIssuesTool,
     input: { organization: "TEST", issueKey: "TEST-5" },
     response: [{ id: 5, issueKey: "TEST-6", summary: "related fixture", type: "Relates" }]
   },
@@ -80,7 +66,6 @@ const cases = [
     operation: "add_related_issue",
     permission: "CREATE",
     method: "addRelatedIssue",
-    factory: addRelatedIssueTool,
     input: { organization: "TEST", issueKey: "TEST-7", targetIssueId: 8 },
     response: { id: 7, issueKey: "TEST-7", summary: "added relation", type: "Relates" }
   },
@@ -88,7 +73,6 @@ const cases = [
     operation: "update_issue_comment",
     permission: "UPDATE",
     method: "patchIssueComment",
-    factory: updateIssueCommentTool,
     input: {
       organization: "TEST",
       issueKey: "TEST-8",
@@ -101,7 +85,6 @@ const cases = [
     operation: "remove_related_issue",
     permission: "DELETE",
     method: "removeRelatedIssue",
-    factory: removeRelatedIssueTool,
     input: { organization: "TEST", issueKey: "TEST-9", relatedIssueId: 10 },
     response: { id: 9, issueKey: "TEST-9", summary: "removed relation", type: "Relates" }
   }
@@ -119,13 +102,12 @@ test("representative CRUD operations match upstream composed MCP handlers", asyn
       );
       const nodeBacklog = mockBacklog(fixture.method, fixture.response, nodeCalls);
 
-      const upstreamTool = fixture.factory(upstreamBacklog, translation);
-      const upstreamHandler = composeToolHandler(upstreamTool, {
+      const upstreamHandler = composeToolHandler(upstreamTool(fixture.operation, upstreamBacklog), {
         useFields: false,
         errorHandler: backlogErrorHandler,
         maxTokens: 100_000
       });
-      const upstreamResult = await upstreamHandler(fixture.input, {});
+      const upstreamResult = await upstreamHandler.handler(fixture.input);
 
       let resolvedOrganization;
       const nodeResult = await runOperation(fixture.operation, fixture.input, {
@@ -148,7 +130,7 @@ test("representative CRUD operations match upstream composed MCP handlers", asyn
   }
 });
 
-test("fields selection matches the upstream composed MCP handler", async () => {
+test("Node preserves GraphQL-style fields while v0.18.0 uses list-only field arrays", async () => {
   const response = {
     id: 6,
     issueKey: "TEST-6",
@@ -160,13 +142,11 @@ test("fields selection matches the upstream composed MCP handler", async () => {
     issueKey: "TEST-6",
     fields: "{ id summary createdUser { name } }"
   };
-  const upstreamTool = getIssueTool(mockBacklog("getIssue", response, []), translation);
-  const upstreamHandler = composeToolHandler(upstreamTool, {
+  const upstreamHandler = composeToolHandler(upstreamTool("get_issue", mockBacklog("getIssue", response, [])), {
     useFields: true,
     errorHandler: backlogErrorHandler,
     maxTokens: 100_000
   });
-  const upstreamResult = await upstreamHandler(input, {});
   const nodeResult = await runOperation("get_issue", input, {
     registry: {
       resolveClient() {
@@ -177,24 +157,28 @@ test("fields selection matches the upstream composed MCP handler", async () => {
   });
 
   assert.equal(nodeResult.success, true);
-  assert.deepEqual(nodeResult.result, mcpData(upstreamResult));
+  assert.equal(upstreamHandler.schema.shape.fields, undefined);
+  assert.deepEqual(nodeResult.result, {
+    id: 6,
+    summary: "fields fixture",
+    createdUser: { name: "User" }
+  });
 });
 
 test("non-positive issue IDs fall back to issueKey in both wrappers", async () => {
   const input = { organization: "TEST", issueId: 0, issueKey: "TEST-10" };
   const upstreamCalls = [];
   const nodeCalls = [];
-  const upstreamTool = getIssueTool(mockBacklog("getIssue", {
+  const upstreamHandler = composeToolHandler(upstreamTool("get_issue", mockBacklog("getIssue", {
     id: 10,
     issueKey: "TEST-10",
     summary: "fallback fixture"
-  }, upstreamCalls), translation);
-  const upstreamHandler = composeToolHandler(upstreamTool, {
+  }, upstreamCalls)), {
     useFields: false,
     errorHandler: backlogErrorHandler,
     maxTokens: 100_000
   });
-  const upstreamResult = await upstreamHandler(input, {});
+  const upstreamResult = await upstreamHandler.handler(input);
   const nodeResult = await runOperation("get_issue", input, {
     registry: {
       resolveClient() {
@@ -216,14 +200,13 @@ test("non-positive issue IDs fall back to issueKey in both wrappers", async () =
 
 test("upstream and Node wrappers preserve the same Backlog error message", async () => {
   const message = "fixture Backlog failure";
-  const upstreamTool = getIssueTool(failingBacklog("getIssue", message), translation);
-  const upstreamHandler = composeToolHandler(upstreamTool, {
+  const upstreamHandler = composeToolHandler(upstreamTool("get_issue", failingBacklog("getIssue", message)), {
     useFields: false,
     errorHandler: backlogErrorHandler,
     maxTokens: 100_000
   });
   const input = { organization: "TEST", issueKey: "TEST-5" };
-  const upstreamResult = await upstreamHandler(input, {});
+  const upstreamResult = await upstreamHandler.handler(input);
   const nodeResult = await runOperation("get_issue", input, {
     registry: {
       resolveClient() {
@@ -261,4 +244,13 @@ function mcpData(result) {
   assert.equal(result.content.length, 1);
   assert.equal(result.content[0].type, "text");
   return JSON.parse(result.content[0].text);
+}
+
+function upstreamTool(operation, backlog) {
+  const tool = allTools(backlog, translation)
+    .toolsets
+    .flatMap((toolset) => toolset.tools)
+    .find((candidate) => candidate.name === operation);
+  assert.ok(tool, `missing upstream tool: ${operation}`);
+  return tool;
 }

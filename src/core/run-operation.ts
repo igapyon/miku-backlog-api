@@ -1,4 +1,4 @@
-import { parseBacklogAPIError } from "backlog-mcp-server/build/backlog/parseBacklogAPIError.js";
+import { backlogErrorHandler } from "backlog-mcp-server";
 import {
   BACKLOG_API_ALLOWED_PERMISSIONS,
   DEFAULT_CRUD_PERMISSIONS,
@@ -175,7 +175,7 @@ export async function runOperation(
       return validation.failure;
     }
     try {
-      const result = await resolved.tool.handler(validation.data);
+      const result = await resolved.tool.handler(validation.record);
       const selectedResult = await selectResultFields(result, fields);
       return {
         schemaVersion: 1,
@@ -231,7 +231,7 @@ export async function runOperation(
   verboseContext.input = validation.record;
 
   try {
-    const result = await resolved.tool.handler(validation.data);
+    const result = await resolved.tool.handler(validation.record);
     const selectedResult = await selectResultFields(result, fields);
     return {
       schemaVersion: 1,
@@ -243,11 +243,11 @@ export async function runOperation(
       trace
     };
   } catch (error) {
-    const parsedError = parseBacklogAPIError(error);
+    const parsedError = backlogErrorHandler(error);
     return failure(
       operation,
       "UPSTREAM_ERROR",
-      parsedError?.message ?? errorMessage(error),
+      parsedError.message ?? errorMessage(error),
       trace,
       resolved.toolset
     );

@@ -33,21 +33,21 @@ node bundle/miku-backlog-api.mjs call get_issue --input request.json
 ```
 
 The CLI supports all 62 normal tools registered by the checked upstream
-`v0.14.0` source plus the Node-specific `get_project_statuses`,
+`v0.18.0` source plus the Node-specific `get_project_statuses`,
 `get_rate_limit`, and `list_organizations` operations. `call` reads one JSON
 object and writes one structured JSON envelope containing the result,
 diagnostics, and upstream trace information.
 
 `tools describe <operation>` is the agent-oriented discovery command. It
-returns the operation input as JSON Schema, the result-field schema used by
-GraphQL-style `fields` selection, important output fields, mutation and
+returns the operation input as JSON Schema, a result-field availability schema
+used by GraphQL-style `fields` selection, important output fields, mutation and
 permission metadata, confirmation requirements, and curated examples when
 available. `call <operation> --help` is an alias for the same credential-free
 JSON output.
 
 ### Issue updates and relations
 
-The v0.14.0 compatibility baseline adds `update_issue_comment`,
+The v0.18.0 compatibility baseline includes `update_issue_comment`,
 `get_related_issues`, `add_related_issue`, and `remove_related_issue`.
 `update_issue` also accepts an optional `parentIssueId`. Use `tools describe`
 for the exact input schema before calling an operation.
@@ -178,16 +178,18 @@ Missing or invalid header values are omitted. Request URLs, API keys, bodies,
 error bodies, and all other headers remain excluded.
 
 Add a top-level `fields` property to the input JSON to select result fields
-with the upstream GraphQL-style syntax:
+with the Node CLI's GraphQL-style syntax:
 
 ```json
 {"issueKey":"PROJ-1","fields":"{ id issueKey summary createdUser { name } }"}
 ```
 
 The CLI validates `fields` before invoking Backlog and always preserves its
-JSON result envelope. Upstream token-count truncation is not exposed because
-cutting serialized JSON can produce an invalid or ambiguous result; use
-`fields` to reduce output instead.
+JSON result envelope. Upstream v0.18.0 uses a list-only field array, so this
+Node-specific nested selection remains a documented compatibility layer.
+Upstream token-count truncation is not exposed because cutting serialized JSON
+can produce an invalid or ambiguous result; use `fields` to reduce output
+instead.
 
 ## Requirements and Authentication
 
