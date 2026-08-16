@@ -1,5 +1,22 @@
 # TODO
 
+## Open Issue Execution
+
+- [x] Execute and verify the local work recorded in
+      [`docs/open-issue-implementation-plan.md`](docs/open-issue-implementation-plan.md).
+- [x] Verify the already-present differential coverage for
+      [Issue #26](https://github.com/igapyon/miku-backlog-api/issues/26)
+      without adding redundant tests.
+- [x] Add the `get_project_statuses` READ contract for
+      [Issue #20](https://github.com/igapyon/miku-backlog-api/issues/20).
+- [x] Add safe `list_organizations` discovery for
+      [Issue #4](https://github.com/igapyon/miku-backlog-api/issues/4).
+- [x] Record the accepted dependency-boundary exception for
+      [Issue #5](https://github.com/igapyon/miku-backlog-api/issues/5).
+- [ ] In a separately approved SCM action, review the diff, prepare evidence
+      comments, and update or close the GitHub Issues. Do not make that
+      external change from this local implementation task.
+
 ## `miku-` Prefix Rename
 
 - [x] Complete the staged rename plan in

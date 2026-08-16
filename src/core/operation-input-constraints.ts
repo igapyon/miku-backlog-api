@@ -27,6 +27,7 @@ const PROJECT_ID_OR_KEY_OPERATIONS = [
   "get_git_repository",
   "get_issue_types",
   "get_project",
+  "get_project_statuses",
   "get_project_users",
   "get_pull_request",
   "get_pull_request_comments",

@@ -18,9 +18,11 @@ wrapper files. File-level traceability remains available through the mapping's
 `upstreamSource`, `upstreamTest`, and `targetEntry` fields and through the CLI
 result `trace` object.
 
-The Node-specific `get_rate_limit` operation is represented separately with
-`origin: "miku-backlog-api"`, no upstream source/test, and direct target source/test
-paths.
+The Node-specific `get_project_statuses`, `get_rate_limit`, and
+`list_organizations` operations are represented separately with
+`origin: "miku-backlog-api"`, no upstream source/test, and direct target
+source/test paths. The first two call supported Backlog client methods; the
+last reads only validated local configuration.
 
 Run `npm run trace:refresh` only with the intended upstream checkout at the
 recorded version. Tests fail when the runtime operation inventory and committed

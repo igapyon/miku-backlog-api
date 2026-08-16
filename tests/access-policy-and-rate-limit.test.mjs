@@ -91,6 +91,148 @@ test("get_rate_limit is a local READ operation", async () => {
   assert.equal(result.trace.source, "src/core/local-tools.ts");
 });
 
+test("get_project_statuses is a local READ operation with project ID/key resolution", async () => {
+  const statuses = [
+    { id: 1, projectId: 10, name: "未対応", color: "#ed8077", displayOrder: 1000 },
+    { id: 9, projectId: 10, name: "独自確認", color: "#3b9dbd", displayOrder: 4000 },
+    { id: 4, projectId: 10, name: "完了", color: "#393939", displayOrder: 5000 }
+  ];
+  const calls = [];
+  const events = [];
+  const result = await runOperation("get_project_statuses", {
+    organization: "TEST",
+    projectId: 10,
+    fields: "{ id name displayOrder }"
+  }, {
+    registry: {
+      resolveClient(organization) {
+        assert.equal(organization, "TEST");
+        return {
+          async getProjectStatuses(projectIdOrKey) {
+            calls.push(projectIdOrKey);
+            return structuredClone(statuses);
+          }
+        };
+      }
+    },
+    onAccess(event) {
+      events.push(event);
+    }
+  });
+
+  assert.equal(result.success, true);
+  assert.deepEqual(calls, [10]);
+  assert.deepEqual(result.result, [
+    { id: 1, name: "未対応", displayOrder: 1000 },
+    { id: 9, name: "独自確認", displayOrder: 4000 },
+    { id: 4, name: "完了", displayOrder: 5000 }
+  ]);
+  assert.equal(result.toolset, "miku-backlog-api");
+  assert.equal(result.trace.origin, "miku-backlog-api");
+  assert.equal(result.trace.source, "src/core/local-tools.ts");
+  assert.deepEqual(events.map((event) => event.phase), ["start", "success"]);
+  assert.deepEqual(events[0].target, { projectId: 10 });
+  assert.equal(events[0].permission, "READ");
+
+  const fallbackCalls = [];
+  const fallback = await runOperation("get_project_statuses", {
+    projectId: 0,
+    projectKey: "PROJ"
+  }, {
+    registry: {
+      resolveClient() {
+        return {
+          async getProjectStatuses(projectIdOrKey) {
+            fallbackCalls.push(projectIdOrKey);
+            return [];
+          }
+        };
+      }
+    }
+  });
+  assert.equal(fallback.success, true);
+  assert.deepEqual(fallbackCalls, ["PROJ"]);
+});
+
+test("get_project_statuses validates a project identifier before resolving a client", async () => {
+  const result = await runOperation("get_project_statuses", {}, {
+    registry: {
+      resolveClient() {
+        throw new Error("must not resolve");
+      }
+    }
+  });
+
+  assert.equal(result.success, false);
+  assert.equal(result.diagnostics[0].code, "INVALID_ARGUMENT");
+  assert.equal(result.diagnostics[0].path, "projectId|projectKey");
+});
+
+test("list_organizations exposes validated configuration without Backlog API access", async () => {
+  const events = [];
+  const single = await runOperation("list_organizations", {
+    fields: "{ name isDefault }"
+  }, {
+    env: {
+      BACKLOG_DOMAIN: "single.example.test",
+      BACKLOG_API_KEY: "TOP_SECRET"
+    },
+    onAccess(event) {
+      events.push(event);
+    }
+  });
+
+  assert.equal(single.success, true);
+  assert.deepEqual(single.result, [{ name: "default", isDefault: true }]);
+  assert.equal(single.toolset, "miku-backlog-api");
+  assert.equal(single.trace.origin, "miku-backlog-api");
+  assert.deepEqual(events, []);
+  assert.doesNotMatch(JSON.stringify(single), /TOP_SECRET/);
+
+  const multi = await runOperation("list_organizations", {}, {
+    env: {
+      BACKLOG_ORG_ZETA_DOMAIN: "zeta.example.test",
+      BACKLOG_ORG_ZETA_API_KEY: "ZETA_SECRET",
+      BACKLOG_ORG_ALPHA_DOMAIN: "alpha.example.test",
+      BACKLOG_ORG_ALPHA_API_KEY: "ALPHA_SECRET",
+      BACKLOG_DEFAULT_ORG: "ZETA"
+    }
+  });
+  assert.equal(multi.success, true);
+  assert.deepEqual(multi.result, [
+    { name: "ALPHA", domain: "alpha.example.test", isDefault: false },
+    { name: "ZETA", domain: "zeta.example.test", isDefault: true }
+  ]);
+  assert.doesNotMatch(JSON.stringify(multi), /SECRET/);
+});
+
+test("list_organizations rejects invalid selection and configuration safely", async () => {
+  const dryRun = await runOperation("list_organizations", {}, { dryRun: true });
+  assert.equal(dryRun.success, true);
+  assert.equal(dryRun.dryRun, true);
+
+  const selection = await runOperation("list_organizations", {
+    organization: "ALPHA"
+  }, {
+    env: {
+      BACKLOG_DOMAIN: "single.example.test",
+      BACKLOG_API_KEY: "TOP_SECRET"
+    }
+  });
+  assert.equal(selection.success, false);
+  assert.equal(selection.diagnostics[0].code, "INVALID_ARGUMENT");
+  assert.doesNotMatch(JSON.stringify(selection), /TOP_SECRET/);
+
+  const incomplete = await runOperation("list_organizations", {}, {
+    env: {
+      BACKLOG_ORG_ALPHA_DOMAIN: "alpha.example.test",
+      BACKLOG_DEFAULT_ORG: "ALPHA"
+    }
+  });
+  assert.equal(incomplete.success, false);
+  assert.equal(incomplete.diagnostics[0].code, "CONFIGURATION_ERROR");
+});
+
 test("response metadata accepts only valid whitelisted rate-limit headers", () => {
   const valid = extractBacklogResponseMetadata(new Response(null, {
     status: 200,

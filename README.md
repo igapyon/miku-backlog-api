@@ -33,9 +33,10 @@ node bundle/miku-backlog-api.mjs call get_issue --input request.json
 ```
 
 The CLI supports all 62 normal tools registered by the checked upstream
-`v0.14.0` source plus the Node-specific `get_rate_limit` operation. `call`
-reads one JSON object and writes one structured JSON
-envelope containing the result, diagnostics, and upstream trace information.
+`v0.14.0` source plus the Node-specific `get_project_statuses`,
+`get_rate_limit`, and `list_organizations` operations. `call` reads one JSON
+object and writes one structured JSON envelope containing the result,
+diagnostics, and upstream trace information.
 
 `tools describe <operation>` is the agent-oriented discovery command. It
 returns the operation input as JSON Schema, the result-field schema used by
@@ -119,6 +120,43 @@ BACKLOG_API_ALLOWED_PERMISSIONS=READ,CREATE,UPDATE,DELETE \
 
 The Node API applies the same rules. Omitting `RunOperationOptions.env` uses
 `process.env`; omitting `allowedPermissions` permits only `READ` for that call.
+
+### Project statuses
+
+The Node-specific `get_project_statuses` READ operation returns the status
+list for one project. Supply either `projectId` or `projectKey`; a non-positive
+`projectId` falls back to `projectKey`, consistently with the upstream
+project-resolution contract.
+
+```bash
+printf '{"projectKey":"PROJ"}\n' | \
+  node bundle/miku-backlog-api.mjs call get_project_statuses
+```
+
+Each returned record contains `id`, `projectId`, `name`, `color`, and
+`displayOrder`. For an agent that needs the non-Closed Issues efficiently,
+resolve the terminal Closed status as the unique greatest `displayOrder`, then
+pass every other returned status ID to `get_issues.statusId`. Do not infer that
+status from a localized name, color, or fixed ID. This is distinct from the
+project's `useResolvedForChart` setting, which controls chart treatment rather
+than the terminal Closed column.
+
+### Organization discovery
+
+The Node-specific `list_organizations` READ operation inspects validated local
+connection configuration without calling the Backlog API. It returns only
+`name`, `domain`, and `isDefault`, never API keys or source environment-variable
+names. Single-organization configuration returns `default`; multi-organization
+output is sorted by name. It accepts `{}` and optional `fields`, but rejects
+`organization` because it lists every configured organization.
+
+```bash
+printf '{}\n' | node bundle/miku-backlog-api.mjs call list_organizations
+```
+
+`--dry-run` validates this empty input without resolving configuration. A real
+call validates configuration but emits no `--verbose` Backlog-access event,
+because no Backlog API access occurs.
 
 ### Rate limits
 

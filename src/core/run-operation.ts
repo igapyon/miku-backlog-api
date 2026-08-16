@@ -22,6 +22,7 @@ import { selectResultFields, validateFieldsSelection } from "./field-selection.j
 import { validateOperationInputConstraints } from "./operation-input-constraints.js";
 import { getUpstreamTrace } from "./traceability.js";
 import { observeBacklogClient } from "./verbose-client.js";
+import { isClientlessLocalOperation } from "./local-tools.js";
 
 export async function runOperation(
   operation: string,
@@ -107,8 +108,30 @@ export async function runOperation(
     return failure(operation, "UNKNOWN_OPERATION", `Unknown operation: ${operation}`, trace);
   }
 
+  const localValidation = metadataResolved.toolset === "miku-backlog-api"
+    ? validateToolInput(
+      operation,
+      metadataResolved.toolset,
+      metadataResolved.tool.schema,
+      toolInput,
+      trace
+    )
+    : undefined;
+  if (localValidation !== undefined && !localValidation.ok) {
+    return localValidation.failure;
+  }
+  if (isClientlessLocalOperation(operation) && organization !== undefined) {
+    return failure(
+      operation,
+      "INVALID_ARGUMENT",
+      "organization is not valid for an operation that lists all configured organizations.",
+      trace,
+      metadataResolved.toolset
+    );
+  }
+
   if (options.dryRun === true) {
-    const validation = validateToolInput(
+    const validation = localValidation ?? validateToolInput(
       operation,
       metadataResolved.toolset,
       metadataResolved.tool.schema,
@@ -136,6 +159,43 @@ export async function runOperation(
   } catch (error) {
     return failure(operation, "CONFIGURATION_ERROR", errorMessage(error), trace);
   }
+  if (isClientlessLocalOperation(operation)) {
+    const resolved = resolveTool({}, operation, registry);
+    if (!resolved) {
+      return failure(operation, "UNKNOWN_OPERATION", `Unknown operation: ${operation}`, trace);
+    }
+    const validation = localValidation ?? validateToolInput(
+      operation,
+      resolved.toolset,
+      resolved.tool.schema,
+      toolInput,
+      trace
+    );
+    if (!validation.ok) {
+      return validation.failure;
+    }
+    try {
+      const result = await resolved.tool.handler(validation.data);
+      const selectedResult = await selectResultFields(result, fields);
+      return {
+        schemaVersion: 1,
+        operation,
+        toolset: resolved.toolset,
+        success: true,
+        result: selectedResult,
+        diagnostics: [],
+        trace
+      };
+    } catch (error) {
+      return failure(
+        operation,
+        "CONFIGURATION_ERROR",
+        errorMessage(error),
+        trace,
+        resolved.toolset
+      );
+    }
+  }
   let backlog;
   try {
     backlog = registry.resolveClient(organization);
@@ -158,7 +218,7 @@ export async function runOperation(
   if (!resolved) {
     return failure(operation, "UNKNOWN_OPERATION", `Unknown operation: ${operation}`, trace);
   }
-  const validation = validateToolInput(
+  const validation = localValidation ?? validateToolInput(
     operation,
     resolved.toolset,
     resolved.tool.schema,
