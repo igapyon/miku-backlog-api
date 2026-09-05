@@ -1,5 +1,13 @@
 # Upstream Follow-Up Log
 
+## 2026-09-05 — Upstream Output Metadata Contract
+
+- accepted v0.18.0's removal of recursive output value schemas without a Node
+  compatibility layer
+- expose `outputFields` for upstream operations and reserve
+  `outputFieldSchema` for Node-specific operations that define an actual output
+  schema
+
 ## 2026-08-16 — v0.18.0 Compatibility Refresh
 
 - pinned `backlog-mcp-server@0.18.0` and checked upstream tag `v0.18.0` at

@@ -39,8 +39,8 @@ object and writes one structured JSON envelope containing the result,
 diagnostics, and upstream trace information.
 
 `tools describe <operation>` is the agent-oriented discovery command. It
-returns the operation input as JSON Schema, a result-field availability schema
-used by GraphQL-style `fields` selection, important output fields, mutation and
+returns the operation input as JSON Schema, an `outputFields` inventory for
+upstream result fields, important output fields, mutation and
 permission metadata, confirmation requirements, and curated examples when
 available. `call <operation> --help` is an alias for the same credential-free
 JSON output.
@@ -187,9 +187,11 @@ with the Node CLI's GraphQL-style syntax:
 The CLI validates `fields` before invoking Backlog and always preserves its
 JSON result envelope. Upstream v0.18.0 uses a list-only field array, so this
 Node-specific nested selection remains a documented compatibility layer.
-Upstream token-count truncation is not exposed because cutting serialized JSON
-can produce an invalid or ambiguous result; use `fields` to reduce output
-instead.
+`tools describe` exposes upstream field names as `outputFields`; it does not
+synthesize an `outputFieldSchema` because v0.18.0 no longer provides recursive
+output value schemas. Upstream token-count truncation is not exposed because
+cutting serialized JSON can produce an invalid or ambiguous result; use
+`fields` to reduce output instead.
 
 ## Requirements and Authentication
 

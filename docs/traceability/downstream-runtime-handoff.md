@@ -25,6 +25,8 @@
 - replaced unexported upstream module imports with the public root library API
 - retained nested GraphQL-style Node `fields`; upstream v0.18.0 now exposes
   list-only field arrays and untyped output field names
+- expose upstream operation result fields as `outputFields`; do not synthesize
+  `outputFieldSchema` compatibility metadata for those operations
 
 The Node runtime continues to require the environment permission ceiling and
 call-level `--allow` for every write. `remove_related_issue` also requires

@@ -7,6 +7,7 @@ Target test layers:
 
 - `tests/node-runtime.test.mjs`
   - operation inventory parity
+  - upstream `outputFields` and Node-specific `outputFieldSchema` contracts
   - source and upstream-test mapping completeness
   - input schema validation
   - direct handler invocation with a mocked Backlog client
@@ -19,7 +20,7 @@ Target test layers:
     message parity
   - upstream v0.18.0 field-selection difference and retained Node contract
 - `tests/node-cli.test.mjs`
-  - metadata commands
+  - metadata commands and upstream output-field inventory
   - JSON stdout and exit-code behavior
 - `tests/access-policy-and-rate-limit.test.mjs`
   - environment CRUD permission parsing and enforcement
