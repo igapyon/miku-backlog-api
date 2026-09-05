@@ -103,7 +103,9 @@ test("CLI metadata commands do not require credentials", () => {
     { required: ["issueId"] },
     { required: ["issueKey"] }
   ]);
-  assert.equal(description.operation.outputFieldSchema.properties.summary, true);
+  assert.equal(description.operation.outputFieldSchema, undefined);
+  assert.equal(description.operation.outputFields.includes("summary"), true);
+  assert.equal(description.operation.outputFields.includes("childIssueSummary"), true);
   assert.deepEqual(description.operation.examples, [
     { issueKey: "PROJ-1" },
     { issueId: 12345 }

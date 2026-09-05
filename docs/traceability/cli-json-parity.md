@@ -15,8 +15,9 @@
   runtime imports its public `allTools` and `backlogErrorHandler` exports rather
   than unexported `build/` subpaths.
 - Dynamic toolsets are removed from the upstream MCP server.
-- Upstream field selection is a list-only array on list-returning tools, and
-  upstream output metadata identifies field names without output value types.
+- Upstream field selection is a list-only array on list-returning tools.
+  `tools describe` exposes the upstream `outputFields` inventory and does not
+  synthesize output value schemas that v0.18.0 no longer publishes.
 - `update_issue_comment`, related-Issue operations, optional `parentIssueId`,
   and non-positive Issue-ID fallback remain covered by the converted contract.
 
@@ -55,8 +56,9 @@ use the same envelope with `success: false` and error diagnostics.
 - no MCP dynamic-toolset calls
 - nested GraphQL-style `fields` selection is retained as a Node top-level input
   property; it is no longer an upstream MCP parity feature
-- `tools describe <operation>` exposes credential-free input JSON Schema and a
-  result-field availability schema; upstream v0.18.0 field names are untyped
+- `tools describe <operation>` exposes credential-free input JSON Schema and
+  the upstream top-level `outputFields` inventory; individual field types are
+  intentionally absent
 - handler-level ID/key and ID/name alternatives are validated before dry-run
   succeeds
 - dry-run validates without resolving a Backlog connection

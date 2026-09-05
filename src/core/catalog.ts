@@ -142,7 +142,12 @@ export function describeOperation(operationName: string) {
     toJsonSchema(resolved.tool.schema),
     operationName
   );
-  const outputSchema = outputFieldSchema(resolved.tool);
+  const outputSchema = hasOutputSchema(resolved.tool)
+    ? toJsonSchema(resolved.tool.outputSchema)
+    : undefined;
+  const outputFields = hasOutputFields(resolved.tool)
+    ? resolved.tool.outputFields.map(String)
+    : undefined;
   const examples = OPERATION_EXAMPLES.get(operationName);
   return {
     name: resolved.tool.name,
@@ -156,6 +161,7 @@ export function describeOperation(operationName: string) {
     credentialsRequiredForDryRun: false,
     inputSchema,
     ...(outputSchema === undefined ? {} : { outputFieldSchema: outputSchema }),
+    ...(outputFields === undefined ? {} : { outputFields }),
     ...(resolved.tool.importantFields === undefined
       ? {}
       : { importantOutputFields: resolved.tool.importantFields }),
@@ -251,23 +257,6 @@ function toJsonSchema(schema: unknown): JsonObject {
   ) as JsonObject;
 }
 
-function outputFieldSchema(tool: object): JsonObject | undefined {
-  if (hasOutputSchema(tool)) {
-    return toJsonSchema(tool.outputSchema);
-  }
-  if (!hasOutputFields(tool)) {
-    return undefined;
-  }
-  const objectSchema: JsonObject = {
-    type: "object",
-    properties: Object.fromEntries(tool.outputFields.map((field) => [String(field), true])),
-    additionalProperties: true
-  };
-  return tool.returnsList === true
-    ? { type: "array", items: objectSchema }
-    : objectSchema;
-}
-
 function hasToJsonSchema(value: unknown): value is { toJSONSchema(): JsonObject } {
   return typeof value === "object" && value !== null &&
     "toJSONSchema" in value && typeof value.toJSONSchema === "function";
@@ -279,9 +268,8 @@ function hasOutputSchema(value: object): value is { outputSchema: unknown } {
 
 function hasOutputFields(
   value: object
-): value is { outputFields: readonly PropertyKey[]; returnsList: boolean } {
-  return "outputFields" in value && Array.isArray(value.outputFields) &&
-    "returnsList" in value && typeof value.returnsList === "boolean";
+): value is { outputFields: readonly PropertyKey[] } {
+  return "outputFields" in value && Array.isArray(value.outputFields);
 }
 
 function addCliInputMetadata(

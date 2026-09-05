@@ -63,7 +63,14 @@ test("all operations expose machine-readable agent contracts", () => {
     assert.equal(description.inputSchema.properties.organization.type, "string");
     assert.equal(description.inputSchema.properties.fields.type, "string");
     assert.equal(description.credentialsRequiredForDryRun, false);
-    assert.equal(typeof description.outputFieldSchema, "object");
+    if (catalogEntry.toolset === "miku-backlog-api") {
+      assert.equal(typeof description.outputFieldSchema, "object");
+      assert.equal(description.outputFields, undefined);
+    } else {
+      assert.equal(description.outputFieldSchema, undefined);
+      assert.equal(Array.isArray(description.outputFields), true);
+      assert.ok(description.outputFields.length > 0);
+    }
   }
   assert.equal(describeOperation("not_an_operation"), undefined);
 });
