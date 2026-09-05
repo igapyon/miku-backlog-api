@@ -5,7 +5,7 @@
 - upstream package: `backlog-mcp-server@0.18.0`
 - upstream tag: `v0.18.0`
 - upstream commit: `1ca465a97d4ec09b96c7b4bece5135004454d2b8`
-- current package version: `0.7.7`
+- current package version: `0.7.8`
 - normal upstream operations: 62
 - Node-specific operations: `get_project_statuses`, `get_rate_limit`, and
   `list_organizations`

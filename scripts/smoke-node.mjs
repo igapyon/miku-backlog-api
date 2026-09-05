@@ -13,7 +13,7 @@ for (const args of [["--version"], ["--help"], ["tools", "list"]]) {
 
 const runtime = await import("../bundle/miku-backlog-api-runtime.mjs");
 assert.equal(runtime.product.name, "miku-backlog-api");
-assert.equal(runtime.product.version, "0.7.7");
+assert.equal(runtime.product.version, "0.7.8");
 assert.equal(runtime.listOperations().length, 65);
 assert.equal(
   runtime.listOperations().find((operation) => operation.name === "get_rate_limit")
