@@ -32,6 +32,13 @@ Target test layers:
   - representative CRUD response metadata
 - `scripts/smoke-node.mjs`
   - generated CLI metadata commands and importable runtime startup
+- `tests/download-operations.test.mjs`
+  - shared-file directory listing, ID/key selection, paging, fields, and
+    sanitized verbose metadata
+  - streamed issue, Wiki, and shared-file downloads, including named
+    organization selection and response rate-limit metadata
+  - whole-transfer failure reporting, dry-run no-I/O behavior, and atomic
+    no-overwrite binary file output
 
 The differential suite unwraps the upstream MCP text content and compares its
 data with the Node JSON envelope. It separately verifies the intentional

@@ -7,6 +7,8 @@ import {
   parseCliArguments
 } from "./core/cli-arguments.js";
 import type { BacklogAccessEvent, RunOperationOptions } from "./core/contracts.js";
+import { openDownload } from "./core/download-operation.js";
+import { writeDownloadToOutput } from "./core/download-output.js";
 import { getMapping } from "./core/traceability.js";
 import { runOperation } from "./core/run-operation.js";
 import { formatBacklogAccessEvent } from "./core/verbose-format.js";
@@ -22,6 +24,8 @@ Usage:
   miku-backlog-api trace [operation]
   miku-backlog-api call <operation> [--input <file|->] [--allow <permissions>]
       [--dry-run] [--confirm-destructive] [--verbose]
+  miku-backlog-api download <operation> --output <file|-> [--input <file|->]
+      [--allow <permissions>] [--dry-run] [--verbose]
 
 Commands:
   --version
@@ -50,6 +54,11 @@ Commands:
       "tools describe <operation>" to discover its input contract.
       "call <operation> --help" is an alias for "tools describe <operation>".
 
+  download <operation>
+      Open a binary download operation and write its bytes to --output. Use
+      --output - only when stdout is reserved for binary data. File output is
+      written through a temporary sibling file and never overwrites a target.
+
 Call options:
   --input <file>          Read the request object from a UTF-8 JSON file.
   --input -               Read the request object from stdin (default).
@@ -68,6 +77,12 @@ Call options:
                           data, full arguments/results, and error text are omitted.
   Each option may be specified once. Unknown options, duplicate options, and
   extra positional arguments are usage errors.
+
+Download output:
+  --output <file>         Write binary content to a new file. On success, write
+                          a JSON transfer summary to stdout.
+  --output -              Write binary content only to stdout. Diagnostics and
+                          verbose events are written to stderr.
 
 Input JSON:
   The input must be exactly one JSON object. Operation arguments are top-level
@@ -223,6 +238,60 @@ async function main(): Promise<void> {
     }
     return;
   }
+  if (command.kind === "download") {
+    const input = JSON.parse(await readInput(command.inputPath));
+    const options: RunOperationOptions = {
+      dryRun: command.dryRun,
+      allowedPermissions: command.allowedPermissions
+    };
+    if (command.verbose) {
+      options.onAccess = writeVerboseEvent;
+    }
+    const result = await openDownload(command.operation, input, options);
+    if (!result.success) {
+      writeJsonTo(process.stderr, result);
+      process.exitCode = result.diagnostics.some((diagnostic) =>
+        diagnostic.code === "INVALID_ARGUMENT" || diagnostic.code === "INVALID_FIELDS"
+      ) ? 2 : 1;
+      return;
+    }
+    if (result.dryRun === true) {
+      writeJson(result);
+      return;
+    }
+    if (result.transfer === undefined) {
+      throw new Error("Binary download operation did not return a transfer.");
+    }
+    try {
+      await writeDownloadToOutput(result.transfer, command.outputPath);
+    } catch (error) {
+      writeJsonTo(process.stderr, {
+        schemaVersion: 1,
+        operation: command.operation,
+        success: false,
+        diagnostics: [{
+          code: "UPSTREAM_ERROR",
+          severity: "error",
+          message: error instanceof Error ? error.message : String(error)
+        }],
+        trace: result.trace
+      });
+      process.exitCode = 1;
+      return;
+    }
+    if (command.outputPath !== "-") {
+      writeJson({
+        schemaVersion: 1,
+        operation: command.operation,
+        toolset: result.toolset,
+        success: true,
+        outputPath: command.outputPath,
+        ...(result.transfer.filename === undefined ? {} : { filename: result.transfer.filename }),
+        diagnostics: [],
+        trace: result.trace
+      });
+    }
+  }
 }
 
 async function readInput(inputPath: string): Promise<string> {
@@ -241,7 +310,11 @@ async function readInput(inputPath: string): Promise<string> {
 }
 
 function writeJson(value: unknown): void {
-  process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
+  writeJsonTo(process.stdout, value);
+}
+
+function writeJsonTo(stream: NodeJS.WritableStream, value: unknown): void {
+  stream.write(`${JSON.stringify(value, null, 2)}\n`);
 }
 
 function writeVerboseEvent(event: BacklogAccessEvent): void {

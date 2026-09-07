@@ -86,6 +86,14 @@ personal data, and upstream error text are omitted from verbose events
   resolving a client; it otherwise calls the Backlog status-list endpoint
 - `list_organizations` validates local configuration and returns non-secret
   metadata without selecting a client or emitting a Backlog access event
+- `get_shared_files` is a Node-specific READ operation for project shared-file
+  directory metadata, including Backlog paging and file-or-folder distinction
+- binary issue-attachment, Wiki-attachment, and shared-file responses use the
+  separate `download` command and `openDownload` API rather than the JSON
+  `call` envelope. File destinations are no-overwrite atomic writes; stdout
+  binary mode contains no JSON envelope. A verbose success event is emitted
+  only when the stream completes, and an interrupted or cancelled stream emits
+  a failure event
 
 Stdout is reserved for metadata or result JSON except `--help` and `--version`.
 Unexpected CLI failures go to stderr.

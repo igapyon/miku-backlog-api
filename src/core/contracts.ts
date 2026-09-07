@@ -16,6 +16,7 @@ export type DiagnosticCode =
   | "ORGANIZATION_ERROR"
   | "UNKNOWN_OPERATION"
   | "INVALID_ARGUMENT"
+  | "BINARY_OUTPUT_REQUIRED"
   | "UPSTREAM_ERROR";
 
 export interface Diagnostic {
@@ -63,6 +64,7 @@ export interface BacklogResourceIdentifiers {
   pullRequestNumber?: number;
   commentId?: number;
   attachmentId?: number | readonly number[];
+  sharedFileId?: number;
 }
 
 export interface BacklogPaginationMetadata {
@@ -123,3 +125,24 @@ export interface OperationSuccess {
 }
 
 export type OperationResult = OperationSuccess | OperationFailure;
+
+export interface DownloadTransfer {
+  body: ReadableStream<Uint8Array>;
+  completed: Promise<void>;
+  filename?: string;
+  url?: string;
+}
+
+export interface DownloadOperationSuccess {
+  schemaVersion: 1;
+  operation: string;
+  toolset: string;
+  success: true;
+  transfer?: DownloadTransfer;
+  dryRun?: true;
+  input?: unknown;
+  diagnostics: [];
+  trace: UpstreamTrace;
+}
+
+export type DownloadOperationResult = DownloadOperationSuccess | OperationFailure;

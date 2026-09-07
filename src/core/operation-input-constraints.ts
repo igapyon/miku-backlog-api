@@ -12,7 +12,8 @@ const ISSUE_ID_OR_KEY_OPERATIONS = [
   "get_related_issues",
   "remove_related_issue",
   "update_issue",
-  "update_issue_comment"
+  "update_issue_comment",
+  "download_issue_attachment"
 ] as const;
 
 const PROJECT_ID_OR_KEY_OPERATIONS = [
@@ -39,7 +40,9 @@ const PROJECT_ID_OR_KEY_OPERATIONS = [
   "update_project",
   "update_pull_request",
   "update_pull_request_comment",
-  "update_version_milestone"
+  "update_version_milestone",
+  "get_shared_files",
+  "download_shared_file"
 ] as const;
 
 const REPOSITORY_ID_OR_NAME_OPERATIONS = [
@@ -81,12 +84,18 @@ export function validateOperationInputConstraints(
 ): Array<{ path: string; message: string }> {
   return getAlternativeFieldConstraints(operation)
     .filter((constraint) =>
-      constraint.fields.every((field) => input[field] === undefined)
+      constraint.fields.every((field) => !hasIdentifierValue(input[field], field))
     )
     .map((constraint) => ({
       path: constraint.fields.join("|"),
       message: constraint.message
     }));
+}
+
+function hasIdentifierValue(value: unknown, field: string): boolean {
+  return field.endsWith("Id")
+    ? typeof value === "number" && Number.isFinite(value) && value > 0
+    : typeof value === "string" && value.length > 0;
 }
 
 function addConstraints(

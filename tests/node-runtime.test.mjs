@@ -21,19 +21,23 @@ test("all upstream operations have deterministic source and test mappings", () =
   const runtimeNames = listOperations().map((entry) => entry.name);
   const mappedNames = mapping.operations.map((entry) => entry.operation);
 
-  assert.equal(runtimeNames.length, 65);
+  assert.equal(runtimeNames.length, 69);
   assert.deepEqual(mappedNames, runtimeNames);
   const upstreamEntries = mapping.operations.filter((entry) => entry.origin === "upstream");
   const localEntries = mapping.operations.filter((entry) => entry.origin === "miku-backlog-api");
   assert.equal(upstreamEntries.length, 62);
   assert.deepEqual(localEntries.map((entry) => entry.operation), [
+    "download_issue_attachment",
+    "download_shared_file",
+    "download_wiki_attachment",
     "get_project_statuses",
     "get_rate_limit",
+    "get_shared_files",
     "list_organizations"
   ]);
   for (const entry of localEntries) {
     assert.equal(entry.upstreamSource, null);
-    assert.equal(entry.targetEntry, "src/core/local-tools.ts");
+    assert.match(entry.targetEntry, /^src\/core\/(local-tools|download-operation)\.ts$/);
   }
   for (const entry of upstreamEntries) {
     assert.match(entry.upstreamSource, /^src\/tools\/.+\.ts$/);
@@ -63,7 +67,10 @@ test("all operations expose machine-readable agent contracts", () => {
     assert.equal(description.inputSchema.properties.organization.type, "string");
     assert.equal(description.inputSchema.properties.fields.type, "string");
     assert.equal(description.credentialsRequiredForDryRun, false);
-    if (catalogEntry.toolset === "miku-backlog-api") {
+    if (description.outputMode === "binary") {
+      assert.equal(description.outputFieldSchema, undefined);
+      assert.equal(description.outputFields, undefined);
+    } else if (catalogEntry.toolset === "miku-backlog-api") {
       assert.equal(typeof description.outputFieldSchema, "object");
       assert.equal(description.outputFields, undefined);
     } else {

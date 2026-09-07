@@ -22,7 +22,7 @@ import { selectResultFields, validateFieldsSelection } from "./field-selection.j
 import { validateOperationInputConstraints } from "./operation-input-constraints.js";
 import { getUpstreamTrace } from "./traceability.js";
 import { observeBacklogClient } from "./verbose-client.js";
-import { isClientlessLocalOperation } from "./local-tools.js";
+import { isBinaryLocalOperation, isClientlessLocalOperation } from "./local-tools.js";
 
 export async function runOperation(
   operation: string,
@@ -125,6 +125,15 @@ export async function runOperation(
       operation,
       "INVALID_ARGUMENT",
       "organization is not valid for an operation that lists all configured organizations.",
+      trace,
+      metadataResolved.toolset
+    );
+  }
+  if (isBinaryLocalOperation(operation)) {
+    return failure(
+      operation,
+      "BINARY_OUTPUT_REQUIRED",
+      `Operation ${operation} returns binary data. Use the download command or openDownload API.`,
       trace,
       metadataResolved.toolset
     );

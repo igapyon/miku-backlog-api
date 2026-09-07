@@ -175,6 +175,36 @@
       "targetTest": "tests/upstream-differential.test.mjs"
     },
     {
+      "operation": "download_issue_attachment",
+      "toolset": "miku-backlog-api",
+      "mutationClass": "read",
+      "origin": "miku-backlog-api",
+      "upstreamSource": null,
+      "upstreamTest": null,
+      "targetEntry": "src/core/download-operation.ts",
+      "targetTest": "tests/download-operations.test.mjs"
+    },
+    {
+      "operation": "download_shared_file",
+      "toolset": "miku-backlog-api",
+      "mutationClass": "read",
+      "origin": "miku-backlog-api",
+      "upstreamSource": null,
+      "upstreamTest": null,
+      "targetEntry": "src/core/download-operation.ts",
+      "targetTest": "tests/download-operations.test.mjs"
+    },
+    {
+      "operation": "download_wiki_attachment",
+      "toolset": "miku-backlog-api",
+      "mutationClass": "read",
+      "origin": "miku-backlog-api",
+      "upstreamSource": null,
+      "upstreamTest": null,
+      "targetEntry": "src/core/download-operation.ts",
+      "targetTest": "tests/download-operations.test.mjs"
+    },
+    {
       "operation": "get_categories",
       "toolset": "issue",
       "mutationClass": "read",
@@ -423,6 +453,16 @@
       "upstreamTest": "src/tools/getResolutions.test.ts",
       "targetEntry": "src/core/run-operation.ts",
       "targetTest": "tests/upstream-differential.test.mjs"
+    },
+    {
+      "operation": "get_shared_files",
+      "toolset": "miku-backlog-api",
+      "mutationClass": "read",
+      "origin": "miku-backlog-api",
+      "upstreamSource": null,
+      "upstreamTest": null,
+      "targetEntry": "src/core/local-tools.ts",
+      "targetTest": "tests/download-operations.test.mjs"
     },
     {
       "operation": "get_space",

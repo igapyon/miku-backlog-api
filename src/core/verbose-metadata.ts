@@ -35,7 +35,8 @@ const TARGET_FIELDS = new Set([
   "repositoryName",
   "pullRequestId",
   "number",
-  "commentId"
+  "commentId",
+  "sharedFileId"
 ]);
 
 export function extractInputAccessMetadata(
@@ -57,7 +58,8 @@ export function extractInputAccessMetadata(
       ? numberValue(input.number)
       : undefined,
     commentId: numberValue(input.commentId),
-    attachmentId: numberOrNumberArray(input.attachmentId)
+    attachmentId: numberOrNumberArray(input.attachmentId),
+    sharedFileId: numberValue(input.sharedFileId)
   });
   const pagination = compactPagination({
     offset: numberValue(input.offset),

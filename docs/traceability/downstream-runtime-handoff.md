@@ -7,8 +7,9 @@
 - upstream commit: `1ca465a97d4ec09b96c7b4bece5135004454d2b8`
 - current package version: `0.7.8`
 - normal upstream operations: 62
-- Node-specific operations: `get_project_statuses`, `get_rate_limit`, and
-  `list_organizations`
+- Node-specific operations: `get_project_statuses`, `get_rate_limit`,
+  `list_organizations`, `get_shared_files`, `download_issue_attachment`,
+  `download_wiki_attachment`, and `download_shared_file`
 
 ## Runtime Changes for the Sister Agent Skill
 
@@ -27,6 +28,14 @@
   list-only field arrays and untyped output field names
 - expose upstream operation result fields as `outputFields`; do not synthesize
   `outputFieldSchema` compatibility metadata for those operations
+- added `get_shared_files` (READ) for project shared-file directory listing,
+  with offset/count paging and file-or-folder metadata
+- added streamed READ downloads for issue attachments, Wiki attachments, and
+  project shared files; Node consumers use `openDownload`, whose `completed`
+  promise represents whole-transfer success or failure
+- added the `download` CLI command. It keeps binary output separate from JSON,
+  writes file destinations atomically without overwrite, and defers successful
+  verbose completion until all bytes are consumed
 
 The Node runtime continues to require the environment permission ceiling and
 call-level `--allow` for every write. `remove_related_issue` also requires

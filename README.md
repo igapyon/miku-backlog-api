@@ -30,13 +30,15 @@ node bundle/miku-backlog-api.mjs tools list
 node bundle/miku-backlog-api.mjs tools describe get_issue
 node bundle/miku-backlog-api.mjs trace get_issue
 node bundle/miku-backlog-api.mjs call get_issue --input request.json
+node bundle/miku-backlog-api.mjs download download_issue_attachment --input request.json --output issue.bin
 ```
 
 The CLI supports all 62 normal tools registered by the checked upstream
-`v0.18.0` source plus the Node-specific `get_project_statuses`,
-`get_rate_limit`, and `list_organizations` operations. `call` reads one JSON
-object and writes one structured JSON envelope containing the result,
-diagnostics, and upstream trace information.
+`v0.18.0` source plus seven Node-specific operations: `get_project_statuses`,
+`get_rate_limit`, `list_organizations`, `get_shared_files`, and the three
+binary download operations. `call` reads one JSON object and writes one
+structured JSON envelope containing the result, diagnostics, and upstream
+trace information.
 
 `tools describe <operation>` is the agent-oriented discovery command. It
 returns the operation input as JSON Schema, an `outputFields` inventory for
@@ -140,6 +142,48 @@ pass every other returned status ID to `get_issues.statusId`. Do not infer that
 status from a localized name, color, or fixed ID. This is distinct from the
 project's `useResolvedForChart` setting, which controls chart treatment rather
 than the terminal Closed column.
+
+### Archive files and attachments
+
+Use `get_shared_files` to list a project shared-file directory. It accepts a
+project ID or key, a directory `path`, and optional `order`, `offset`, and
+`count` values. Returned entries preserve Backlog's `type` (`file` or `dir`),
+`id`, `name`, `dir`, and `size` metadata and use the ordinary JSON `call`
+contract.
+
+```bash
+printf '{"projectKey":"PROJ","path":"/archive/","count":100}\n' | \
+  node bundle/miku-backlog-api.mjs call get_shared_files
+```
+
+`download_issue_attachment`, `download_wiki_attachment`, and
+`download_shared_file` open Backlog binary responses as streams. They are READ
+operations and support the usual organization choice, permission policy,
+dry-run validation, and sanitized verbose events. Use `download`, not `call`:
+
+```bash
+printf '{"issueKey":"PROJ-1","attachmentId":12345}\n' | \
+  node bundle/miku-backlog-api.mjs download download_issue_attachment --output issue-attachment.bin
+printf '{"wikiId":123,"attachmentId":456}\n' | \
+  node bundle/miku-backlog-api.mjs download download_wiki_attachment --output wiki-attachment.bin
+printf '{"projectKey":"PROJ","sharedFileId":789}\n' | \
+  node bundle/miku-backlog-api.mjs download download_shared_file --output shared-file.bin
+```
+
+With a file output, the CLI writes to a temporary sibling `.part` file, then
+atomically creates the destination only after the stream finishes. It refuses
+to overwrite an existing path and prints a JSON transfer summary to stdout.
+`--output -` writes only the binary bytes to stdout; diagnostics and `--verbose`
+events remain on stderr.
+`--dry-run` makes no Backlog request and writes no file. Binary operations
+called through `call` fail with `BINARY_OUTPUT_REQUIRED` so JSON and file bytes
+cannot be mixed.
+
+The Node API exports `openDownload(operation, input, options)`. Its successful
+result supplies `transfer.body` as a `ReadableStream` and
+`transfer.completed`, which resolves only after every byte has been read and
+rejects on transfer failure or cancellation. Consume the stream without
+buffering it when handling large archive files.
 
 ### Organization discovery
 

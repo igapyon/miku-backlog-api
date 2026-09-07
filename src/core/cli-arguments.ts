@@ -19,6 +19,15 @@ export type CliCommand =
       dryRun: boolean;
       confirmDestructive: boolean;
       verbose: boolean;
+    }
+  | {
+      kind: "download";
+      operation: string;
+      inputPath: string;
+      outputPath: string;
+      allowedPermissions: readonly CrudPermission[];
+      dryRun: boolean;
+      verbose: boolean;
     };
 
 export class CliUsageError extends Error {
@@ -80,7 +89,64 @@ export function parseCliArguments(args: readonly string[]): CliCommand {
   if (args[0] === "call") {
     return parseCallArguments(args);
   }
+  if (args[0] === "download") {
+    return parseDownloadArguments(args);
+  }
   throw new CliUsageError("Unknown command. Use --help for usage.");
+}
+
+function parseDownloadArguments(args: readonly string[]): CliCommand {
+  const operation = args[1];
+  if (operation === undefined || operation.startsWith("--")) {
+    throw new CliUsageError("download requires an operation name.");
+  }
+
+  let inputPath = "-";
+  let outputPath: string | undefined;
+  let allowedPermissions: readonly CrudPermission[] = DEFAULT_CRUD_PERMISSIONS;
+  let dryRun = false;
+  let verbose = false;
+  const seenOptions = new Set<string>();
+
+  for (let index = 2; index < args.length; index += 1) {
+    const argument = args[index]!;
+    if (!argument.startsWith("--")) {
+      throw new CliUsageError(`Unexpected argument for download: ${argument}.`);
+    }
+    if (seenOptions.has(argument)) {
+      throw new CliUsageError(`Option ${argument} may be specified only once.`);
+    }
+    seenOptions.add(argument);
+
+    if (argument === "--input" || argument === "--output" || argument === "--allow") {
+      const value = args[index + 1];
+      if (value === undefined || (argument !== "--output" && value.startsWith("--"))) {
+        throw new CliUsageError(`${argument} requires a value.`);
+      }
+      index += 1;
+      if (argument === "--input") {
+        inputPath = value;
+      } else if (argument === "--output") {
+        outputPath = value;
+      } else {
+        allowedPermissions = parseAllowedPermissions(value);
+      }
+      continue;
+    }
+    if (argument === "--dry-run") {
+      dryRun = true;
+      continue;
+    }
+    if (argument === "--verbose") {
+      verbose = true;
+      continue;
+    }
+    throw new CliUsageError(`Unknown option for download: ${argument}.`);
+  }
+  if (outputPath === undefined) {
+    throw new CliUsageError("download requires --output <file|->.");
+  }
+  return { kind: "download", operation, inputPath, outputPath, allowedPermissions, dryRun, verbose };
 }
 
 function parseCallArguments(args: readonly string[]): CliCommand {
