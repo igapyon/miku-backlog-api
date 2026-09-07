@@ -34,9 +34,10 @@ node bundle/miku-backlog-api.mjs download download_issue_attachment --input requ
 ```
 
 The CLI supports all 62 normal tools registered by the checked upstream
-`v0.18.0` source plus seven Node-specific operations: `get_project_statuses`,
-`get_rate_limit`, `list_organizations`, `get_shared_files`, and the three
-binary download operations. `call` reads one JSON object and writes one
+`v0.18.0` source plus eight Node-specific operations: `get_project_statuses`,
+`get_rate_limit`, `list_organizations`, `get_issue_participants`,
+`get_shared_files`, and the three binary download operations. `call` reads one
+JSON object and writes one
 structured JSON envelope containing the result, diagnostics, and upstream
 trace information.
 
@@ -59,6 +60,23 @@ for the exact input schema before calling an operation.
 DELETE plus `--confirm-destructive`. Every operation accepts either a positive
 `issueId` or an `issueKey` for its source issue; when both are present, a
 non-positive `issueId` falls back to `issueKey`.
+
+### Issue participants
+
+The Node-specific `get_issue_participants` READ operation returns the users
+participating in one issue. Supply a positive `issueId` or an `issueKey`; a
+non-positive ID falls back to the key under the same rule as other issue
+operations. The response is a normal JSON list of Backlog user records, and
+the usual `fields` selection can reduce it to the values needed by an archive.
+
+```bash
+printf '{"issueKey":"PROJ-1","fields":"{ id userId name }"}\n' | \
+  node bundle/miku-backlog-api.mjs call get_issue_participants
+```
+
+The normal organization, dry-run, permission, trace, and verbose rules apply.
+Verbose events expose the issue identifier and access status only; they do not
+include participant records.
 
 Delete operations and broad notification reset require
 `--confirm-destructive`. Use `--dry-run` to validate input without calling

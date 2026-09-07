@@ -4,6 +4,7 @@ import type { BacklogClientRegistry } from "./contracts.js";
 interface LocalBacklogClient {
   getRateLimit(): Promise<unknown>;
   getProjectStatuses(projectIdOrKey: string | number): Promise<unknown>;
+  getIssueParticipants(issueIdOrKey: string | number): Promise<unknown>;
   getSharedFiles(
     projectIdOrKey: string | number,
     path: string,
@@ -17,6 +18,11 @@ interface LocalBacklogClient {
 interface ProjectStatusesInput {
   projectId?: number;
   projectKey?: string;
+}
+
+interface IssueParticipantsInput {
+  issueId?: number;
+  issueKey?: string;
 }
 
 interface IssueAttachmentInput {
@@ -84,6 +90,16 @@ const sharedFileSchema = z.object({
   size: z.number().nonnegative()
 }).passthrough();
 
+const userSchema = z.object({
+  id: positiveInteger,
+  userId: z.string(),
+  name: z.string(),
+  roleType: z.number().int(),
+  lang: z.string(),
+  mailAddress: z.string(),
+  lastLoginTime: z.string()
+}).passthrough();
+
 export function createLocalToolset(backlog: object, options: LocalToolOptions = {}) {
   const client = backlog as LocalBacklogClient;
   return {
@@ -143,6 +159,18 @@ export function createLocalToolset(backlog: object, options: LocalToolOptions = 
             throw new Error("Project ID or key is required.");
           }
           return client.getProjectStatuses(projectIdOrKey);
+        }
+      },
+      {
+        name: "get_issue_participants",
+        description:
+          "Get the participant list for one Backlog issue.",
+        schema: z.object(issueIdentifierSchema).strict(),
+        outputSchema: z.array(userSchema),
+        importantFields: ["id", "userId", "name", "roleType", "lang"],
+        async handler(input: unknown) {
+          const { issueId, issueKey } = input as IssueParticipantsInput;
+          return client.getIssueParticipants(issueIdOrKey(issueId, issueKey));
         }
       },
       {

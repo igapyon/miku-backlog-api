@@ -27,6 +27,10 @@ const LOCAL_OPERATION_MAPPINGS = new Map([
     targetEntry: "src/core/local-tools.ts",
     targetTest: "tests/access-policy-and-rate-limit.test.mjs"
   }],
+  ["get_issue_participants", {
+    targetEntry: "src/core/local-tools.ts",
+    targetTest: "tests/issue-participants.test.mjs"
+  }],
   ["get_shared_files", {
     targetEntry: "src/core/local-tools.ts",
     targetTest: "tests/download-operations.test.mjs"

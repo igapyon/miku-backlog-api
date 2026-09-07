@@ -22,6 +22,7 @@ const OPERATION_POLICIES = new Map<string, OperationPolicy>([
     "get_git_repository",
     "get_issue",
     "get_issue_comments",
+    "get_issue_participants",
     "get_issue_types",
     "get_issues",
     "get_related_issues",
@@ -230,6 +231,7 @@ type JsonObject = Record<string, unknown>;
 const OPERATION_EXAMPLES = new Map<string, readonly JsonObject[]>([
   ["list_organizations", [{}]],
   ["get_issue", [{ issueKey: "PROJ-1" }, { issueId: 12345 }]],
+  ["get_issue_participants", [{ issueKey: "PROJ-1" }, { issueId: 12345 }]],
   ["get_related_issues", [{ issueKey: "PROJ-1" }, { issueId: 12345 }]],
   ["get_project", [{ projectKey: "PROJ" }, { projectId: 12345 }]],
   ["get_project_statuses", [{ projectKey: "PROJ" }, { projectId: 12345 }]],

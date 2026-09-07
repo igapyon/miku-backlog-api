@@ -3,7 +3,7 @@
 ## Initial Design Record
 
 - checked date: 2026-07-22
-- repository version: `0.7.9`
+- repository version: `0.7.10`
 - implementation maturity: beta standalone Node Core/CLI
 - split source: `backlog-api-skills` initial combined implementation
 
@@ -53,7 +53,8 @@ cross-product integrations.
 
 - preserve every upstream normal tool name as one Node operation
 - expose `get_project_statuses`, `get_rate_limit`, `list_organizations`, and
-  `get_shared_files` as clearly identified Node-specific operations
+  `get_issue_participants` and `get_shared_files` as clearly identified
+  Node-specific operations
 - keep attachment and shared-file downloads out of the JSON operation envelope:
   stream them through `openDownload` and the `download` CLI command, emit a
   successful verbose outcome only after the stream completes, and use an

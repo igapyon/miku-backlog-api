@@ -88,6 +88,10 @@ personal data, and upstream error text are omitted from verbose events
   metadata without selecting a client or emitting a Backlog access event
 - `get_shared_files` is a Node-specific READ operation for project shared-file
   directory metadata, including Backlog paging and file-or-folder distinction
+- `get_issue_participants` is a Node-specific READ operation that uses the
+  normal issue ID/key contract and returns participant records through the JSON
+  envelope. Verbose output contains the issue target and access metadata, never
+  participant values
 - binary issue-attachment, Wiki-attachment, and shared-file responses use the
   separate `download` command and `openDownload` API rather than the JSON
   `call` envelope. File destinations are no-overwrite atomic writes; stdout

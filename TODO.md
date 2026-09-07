@@ -22,8 +22,12 @@
       [Issue #32](https://github.com/igapyon/miku-backlog-api/issues/32),
       including JSON directory metadata, binary CLI/API separation, transfer
       completion reporting, and no-overwrite file output.
+- [x] Implement [Issue #37](https://github.com/igapyon/miku-backlog-api/issues/37):
+      add the `get_issue_participants` READ contract with the standard issue
+      identifier, organization, fields, dry-run, trace, and verbose behavior.
 - [ ] In a separately approved SCM action, review the diff, prepare an evidence
-      comment, and update or close [Issue #32](https://github.com/igapyon/miku-backlog-api/issues/32).
+      comment, and close [Issue #32](https://github.com/igapyon/miku-backlog-api/issues/32).
+- [ ] After #37 is merged, close [Issue #37](https://github.com/igapyon/miku-backlog-api/issues/37).
 
 ## `miku-` Prefix Rename
 

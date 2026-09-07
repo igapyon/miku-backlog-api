@@ -39,6 +39,11 @@ Target test layers:
     organization selection and response rate-limit metadata
   - whole-transfer failure reporting, dry-run no-I/O behavior, and atomic
     no-overwrite binary file output
+- `tests/issue-participants.test.mjs`
+  - participant lookup through issue ID/key resolution and named-organization
+    selection
+  - fields selection, dry-run input validation, and sanitized verbose success
+    and upstream-failure events
 
 The differential suite unwraps the upstream MCP text content and compares its
 data with the Node JSON envelope. It separately verifies the intentional

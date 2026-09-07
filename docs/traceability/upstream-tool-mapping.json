@@ -10,7 +10,7 @@
   "target": {
     "repository": "miku-backlog-api",
     "product": "miku-backlog-api",
-    "version": "0.7.9",
+    "version": "0.7.10",
     "strategy": "published-handler-direct-invocation"
   },
   "operations": [
@@ -293,6 +293,16 @@
       "upstreamTest": "src/tools/getIssueComments.test.ts",
       "targetEntry": "src/core/run-operation.ts",
       "targetTest": "tests/upstream-differential.test.mjs"
+    },
+    {
+      "operation": "get_issue_participants",
+      "toolset": "miku-backlog-api",
+      "mutationClass": "read",
+      "origin": "miku-backlog-api",
+      "upstreamSource": null,
+      "upstreamTest": null,
+      "targetEntry": "src/core/local-tools.ts",
+      "targetTest": "tests/issue-participants.test.mjs"
     },
     {
       "operation": "get_issue_types",
