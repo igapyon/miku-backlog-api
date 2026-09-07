@@ -14,7 +14,8 @@ for (const args of [["--version"], ["--help"], ["tools", "list"]]) {
 const runtime = await import("../bundle/miku-backlog-api-runtime.mjs");
 assert.equal(runtime.product.name, "miku-backlog-api");
 assert.equal(runtime.product.version, "0.7.8");
-assert.equal(runtime.listOperations().length, 65);
+assert.equal(typeof runtime.openDownload, "function");
+assert.equal(runtime.listOperations().length, 69);
 assert.equal(
   runtime.listOperations().find((operation) => operation.name === "get_rate_limit")
     ?.requiredPermission,
@@ -30,5 +31,17 @@ assert.equal(
     ?.requiredPermission,
   "READ"
 );
+for (const operationName of [
+  "get_shared_files",
+  "download_issue_attachment",
+  "download_wiki_attachment",
+  "download_shared_file"
+]) {
+  assert.equal(
+    runtime.listOperations().find((operation) => operation.name === operationName)
+      ?.requiredPermission,
+    "READ"
+  );
+}
 
 process.stdout.write("[smoke:node] CLI metadata and importable runtime passed\n");

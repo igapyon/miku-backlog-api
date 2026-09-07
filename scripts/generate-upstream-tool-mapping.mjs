@@ -26,6 +26,22 @@ const LOCAL_OPERATION_MAPPINGS = new Map([
   ["get_rate_limit", {
     targetEntry: "src/core/local-tools.ts",
     targetTest: "tests/access-policy-and-rate-limit.test.mjs"
+  }],
+  ["get_shared_files", {
+    targetEntry: "src/core/local-tools.ts",
+    targetTest: "tests/download-operations.test.mjs"
+  }],
+  ["download_issue_attachment", {
+    targetEntry: "src/core/download-operation.ts",
+    targetTest: "tests/download-operations.test.mjs"
+  }],
+  ["download_wiki_attachment", {
+    targetEntry: "src/core/download-operation.ts",
+    targetTest: "tests/download-operations.test.mjs"
+  }],
+  ["download_shared_file", {
+    targetEntry: "src/core/download-operation.ts",
+    targetTest: "tests/download-operations.test.mjs"
   }]
 ]);
 

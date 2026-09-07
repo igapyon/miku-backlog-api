@@ -18,9 +18,12 @@
       [Issue #4](https://github.com/igapyon/miku-backlog-api/issues/4).
 - [x] Record the accepted dependency-boundary exception for
       [Issue #5](https://github.com/igapyon/miku-backlog-api/issues/5).
-- [ ] In a separately approved SCM action, review the diff, prepare evidence
-      comments, and update or close the GitHub Issues, including #28. Do not make that
-      external change from this local implementation task.
+- [x] Implement the archive attachment and shared-file streaming contracts for
+      [Issue #32](https://github.com/igapyon/miku-backlog-api/issues/32),
+      including JSON directory metadata, binary CLI/API separation, transfer
+      completion reporting, and no-overwrite file output.
+- [ ] In a separately approved SCM action, review the diff, prepare an evidence
+      comment, and update or close [Issue #32](https://github.com/igapyon/miku-backlog-api/issues/32).
 
 ## `miku-` Prefix Rename
 

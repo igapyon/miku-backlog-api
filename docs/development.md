@@ -40,8 +40,8 @@ This repository owns:
 - dry-run and destructive-operation guards
 - environment-level CRUD permission allow-list
 - response-scoped rate-limit metadata and the Node-specific
-  `get_project_statuses`, `get_rate_limit`, and `list_organizations`
-  operations
+  `get_project_statuses`, `get_rate_limit`, `list_organizations`, and archive
+  file operations
 - upstream source, test, and operation traceability
 - Node build, tests, runtime artifacts, and releases
 
@@ -52,8 +52,12 @@ cross-product integrations.
 ## Adopted Decisions
 
 - preserve every upstream normal tool name as one Node operation
-- expose `get_project_statuses`, `get_rate_limit`, and `list_organizations` as
-  clearly identified Node-specific operations
+- expose `get_project_statuses`, `get_rate_limit`, `list_organizations`, and
+  `get_shared_files` as clearly identified Node-specific operations
+- keep attachment and shared-file downloads out of the JSON operation envelope:
+  stream them through `openDownload` and the `download` CLI command, emit a
+  successful verbose outcome only after the stream completes, and use an
+  atomic no-overwrite file destination
 - derive a terminal Closed status only from the greatest `displayOrder`; do not
   use localized status names, colors, or fixed IDs
 - keep organization discovery local: validate configuration, return only

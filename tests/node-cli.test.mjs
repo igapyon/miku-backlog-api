@@ -25,6 +25,7 @@ test("CLI metadata commands do not require credentials", () => {
   assert.equal(help.status, 0);
   assert.equal(help.stderr, "");
   assert.match(help.stdout, /miku-backlog-api call <operation>/);
+  assert.match(help.stdout, /miku-backlog-api download <operation>/);
   assert.match(help.stdout, /tools describe <operation>/);
   assert.match(help.stdout, /Agent discovery:/);
   assert.match(help.stdout, /machine-readable JSON to stdout/);
@@ -46,7 +47,7 @@ test("CLI metadata commands do not require credentials", () => {
   const catalog = JSON.parse(run(["tools", "list"]).stdout);
   assert.equal(catalog.product.name, "miku-backlog-api");
   assert.equal(catalog.product.version, "0.7.8");
-  assert.equal(catalog.operations.length, 65);
+  assert.equal(catalog.operations.length, 69);
   assert.equal(
     catalog.operations.find((operation) => operation.name === "get_issue").requiredPermission,
     "READ"
@@ -69,6 +70,17 @@ test("CLI metadata commands do not require credentials", () => {
       .requiredPermission,
     "READ"
   );
+  for (const operationName of [
+    "get_shared_files",
+    "download_issue_attachment",
+    "download_wiki_attachment",
+    "download_shared_file"
+  ]) {
+    assert.equal(
+      catalog.operations.find((operation) => operation.name === operationName).requiredPermission,
+      "READ"
+    );
+  }
   assert.equal(
     catalog.operations.find((operation) => operation.name === "get_related_issues")
       .requiredPermission,
@@ -158,6 +170,19 @@ test("CLI metadata commands do not require credentials", () => {
   assert.equal(organizationsDescription.operation.requiredPermission, "READ");
   assert.equal(organizationsDescription.operation.outputFieldSchema.type, "array");
   assert.deepEqual(organizationsDescription.operation.examples, [{}]);
+
+  const downloadDescription = JSON.parse(
+    run(["tools", "describe", "download_issue_attachment"]).stdout
+  );
+  assert.equal(downloadDescription.operation.outputMode, "binary");
+  assert.equal(downloadDescription.operation.outputFieldSchema, undefined);
+  assert.equal(downloadDescription.operation.outputFields, undefined);
+  assert.equal(downloadDescription.operation.inputSchema.properties.issueId.type, "integer");
+  assert.equal(downloadDescription.operation.inputSchema.properties.attachmentId.type, "integer");
+  assert.deepEqual(downloadDescription.operation.inputSchema.allOf[0].anyOf, [
+    { required: ["issueId"] },
+    { required: ["issueKey"] }
+  ]);
 });
 
 test("CLI dry-run validates complete input without Backlog credentials", () => {
@@ -203,6 +228,13 @@ test("CLI dry-run validates complete input without Backlog credentials", () => {
   );
   assert.equal(organizationDiscovery.status, 0);
   assert.equal(JSON.parse(organizationDiscovery.stdout).dryRun, true);
+
+  const download = run(
+    ["download", "download_issue_attachment", "--input", "-", "--output", "attachment.bin", "--dry-run"],
+    '{"issueKey":"TEST-1","attachmentId":1}'
+  );
+  assert.equal(download.status, 0);
+  assert.equal(JSON.parse(download.stdout).dryRun, true);
 });
 
 test("CLI allows READ only by default and checks permissions before credentials", () => {
@@ -269,6 +301,8 @@ test("CLI rejects unknown, duplicate, and extra arguments", () => {
     [["call", "get_issue", "--unknown"], /Unknown option for call/],
     [["call", "get_issue", "--dry-run", "--dry-run"], /specified only once/],
     [["call", "get_issue", "extra"], /Unexpected argument for call/],
+    [["download", "download_issue_attachment"], /requires --output/],
+    [["download", "download_issue_attachment", "--output", "-", "--unknown"], /Unknown option for download/],
     [["tools", "list", "extra"], /does not accept additional arguments/],
     [["tools", "describe"], /requires an operation name/],
     [["tools", "describe", "get_issue", "extra"], /does not accept additional arguments/],

@@ -31,6 +31,7 @@ const OPERATION_POLICIES = new Map<string, OperationPolicy>([
     "get_project",
     "get_project_list",
     "get_project_statuses",
+    "get_shared_files",
     "get_project_users",
     "get_pull_request",
     "get_pull_request_comments",
@@ -49,7 +50,10 @@ const OPERATION_POLICIES = new Map<string, OperationPolicy>([
     "get_wiki",
     "get_wiki_pages",
     "get_wikis_count",
-    "list_organizations"
+    "list_organizations",
+    "download_issue_attachment",
+    "download_wiki_attachment",
+    "download_shared_file"
   ], "read", "READ"),
   ...policyEntries([
     "addDocument",
@@ -162,6 +166,7 @@ export function describeOperation(operationName: string) {
     inputSchema,
     ...(outputSchema === undefined ? {} : { outputFieldSchema: outputSchema }),
     ...(outputFields === undefined ? {} : { outputFields }),
+    ...(hasBinaryOutput(resolved.tool) ? { outputMode: "binary" } : {}),
     ...(resolved.tool.importantFields === undefined
       ? {}
       : { importantOutputFields: resolved.tool.importantFields }),
@@ -229,6 +234,10 @@ const OPERATION_EXAMPLES = new Map<string, readonly JsonObject[]>([
   ["get_project", [{ projectKey: "PROJ" }, { projectId: 12345 }]],
   ["get_project_statuses", [{ projectKey: "PROJ" }, { projectId: 12345 }]],
   ["get_rate_limit", [{}]],
+  ["get_shared_files", [{ projectKey: "PROJ", path: "/", offset: 0, count: 100 }]],
+  ["download_issue_attachment", [{ issueKey: "PROJ-1", attachmentId: 12345 }]],
+  ["download_wiki_attachment", [{ wikiId: 12345, attachmentId: 67890 }]],
+  ["download_shared_file", [{ projectKey: "PROJ", sharedFileId: 12345 }]],
   [
     "add_issue",
     [{
@@ -270,6 +279,10 @@ function hasOutputFields(
   value: object
 ): value is { outputFields: readonly PropertyKey[] } {
   return "outputFields" in value && Array.isArray(value.outputFields);
+}
+
+function hasBinaryOutput(value: object): value is { binaryOutput: true } {
+  return "binaryOutput" in value && value.binaryOutput === true;
 }
 
 function addCliInputMetadata(

@@ -1,5 +1,19 @@
 # Upstream Follow-Up Log
 
+## 2026-09-05 — Archive File and Attachment Downloads
+
+- added product-owned READ operations for project shared-file directory
+  metadata and streamed issue attachment, Wiki attachment, and shared-file
+  download responses
+- retained the ordinary JSON envelope for directory metadata, while keeping
+  binary transfers in the separate `openDownload` Node API and `download` CLI
+  command so bytes can never mingle with JSON output
+- use transfer completion, not response-header arrival, to emit a verbose
+  success outcome; capture the response HTTP and rate-limit metadata already
+  available from the scoped Backlog fetch wrapper
+- write file destinations through unique sibling `.part` files and atomically
+  create the destination after a successful transfer; refuse existing paths
+
 ## 2026-09-05 — Upstream Output Metadata Contract
 
 - accepted v0.18.0's removal of recursive output value schemas without a Node
