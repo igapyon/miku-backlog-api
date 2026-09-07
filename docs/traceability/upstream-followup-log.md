@@ -1,5 +1,14 @@
 # Upstream Follow-Up Log
 
+## 2026-09-07 — Issue Participant Lookup
+
+- added the product-owned `get_issue_participants` READ operation backed by
+  `backlog-js#getIssueParticipants`
+- reuse the established issue ID/key, organization, fields, dry-run, trace,
+  permission, and verbose contracts; verbose events omit participant records
+- added direct handler, validation, catalog, runtime, CLI, trace mapping, and
+  success/failure coverage
+
 ## 2026-09-05 — Archive File and Attachment Downloads
 
 - added product-owned READ operations for project shared-file directory

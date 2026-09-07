@@ -9,6 +9,7 @@ const ISSUE_ID_OR_KEY_OPERATIONS = [
   "delete_issue",
   "get_issue",
   "get_issue_comments",
+  "get_issue_participants",
   "get_related_issues",
   "remove_related_issue",
   "update_issue",

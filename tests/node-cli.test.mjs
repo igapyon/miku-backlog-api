@@ -18,7 +18,7 @@ test("package exposes the canonical and compatibility CLI names", () => {
 test("CLI metadata commands do not require credentials", () => {
   const version = run(["--version"]);
   assert.equal(version.status, 0);
-  assert.equal(version.stdout, "0.7.9\n");
+  assert.equal(version.stdout, "0.7.10\n");
   assert.equal(version.stderr, "");
 
   const help = run(["--help"]);
@@ -46,8 +46,8 @@ test("CLI metadata commands do not require credentials", () => {
 
   const catalog = JSON.parse(run(["tools", "list"]).stdout);
   assert.equal(catalog.product.name, "miku-backlog-api");
-  assert.equal(catalog.product.version, "0.7.9");
-  assert.equal(catalog.operations.length, 69);
+  assert.equal(catalog.product.version, "0.7.10");
+  assert.equal(catalog.operations.length, 70);
   assert.equal(
     catalog.operations.find((operation) => operation.name === "get_issue").requiredPermission,
     "READ"
@@ -58,6 +58,11 @@ test("CLI metadata commands do not require credentials", () => {
   );
   assert.equal(
     catalog.operations.find((operation) => operation.name === "get_rate_limit").requiredPermission,
+    "READ"
+  );
+  assert.equal(
+    catalog.operations.find((operation) => operation.name === "get_issue_participants")
+      .requiredPermission,
     "READ"
   );
   assert.equal(
@@ -119,6 +124,20 @@ test("CLI metadata commands do not require credentials", () => {
   assert.equal(description.operation.outputFields.includes("summary"), true);
   assert.equal(description.operation.outputFields.includes("childIssueSummary"), true);
   assert.deepEqual(description.operation.examples, [
+    { issueKey: "PROJ-1" },
+    { issueId: 12345 }
+  ]);
+
+  const participantDescription = JSON.parse(
+    run(["tools", "describe", "get_issue_participants"]).stdout
+  );
+  assert.equal(participantDescription.operation.requiredPermission, "READ");
+  assert.equal(participantDescription.operation.outputFieldSchema.type, "array");
+  assert.deepEqual(participantDescription.operation.inputSchema.allOf[0].anyOf, [
+    { required: ["issueId"] },
+    { required: ["issueKey"] }
+  ]);
+  assert.deepEqual(participantDescription.operation.examples, [
     { issueKey: "PROJ-1" },
     { issueId: 12345 }
   ]);
@@ -195,6 +214,7 @@ test("CLI dry-run validates complete input without Backlog credentials", () => {
 
   for (const [operation, path] of [
     ["get_issue", "issueId|issueKey"],
+    ["get_issue_participants", "issueId|issueKey"],
     ["get_related_issues", "issueId|issueKey"],
     ["get_project", "projectId|projectKey"],
     ["get_project_statuses", "projectId|projectKey"]

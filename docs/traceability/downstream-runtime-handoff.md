@@ -5,11 +5,12 @@
 - upstream package: `backlog-mcp-server@0.18.0`
 - upstream tag: `v0.18.0`
 - upstream commit: `1ca465a97d4ec09b96c7b4bece5135004454d2b8`
-- current package version: `0.7.9`
+- current package version: `0.7.10`
 - normal upstream operations: 62
 - Node-specific operations: `get_project_statuses`, `get_rate_limit`,
-  `list_organizations`, `get_shared_files`, `download_issue_attachment`,
-  `download_wiki_attachment`, and `download_shared_file`
+  `list_organizations`, `get_issue_participants`, `get_shared_files`,
+  `download_issue_attachment`, `download_wiki_attachment`, and
+  `download_shared_file`
 
 ## Runtime Changes for the Sister Agent Skill
 
@@ -30,6 +31,9 @@
   `outputFieldSchema` compatibility metadata for those operations
 - added `get_shared_files` (READ) for project shared-file directory listing,
   with offset/count paging and file-or-folder metadata
+- added `get_issue_participants` (READ), using the normal issue ID/key
+  resolution and returning participant records through the JSON operation
+  contract
 - added streamed READ downloads for issue attachments, Wiki attachments, and
   project shared files; Node consumers use `openDownload`, whose `completed`
   promise represents whole-transfer success or failure

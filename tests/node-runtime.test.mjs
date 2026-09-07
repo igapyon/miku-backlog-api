@@ -21,7 +21,7 @@ test("all upstream operations have deterministic source and test mappings", () =
   const runtimeNames = listOperations().map((entry) => entry.name);
   const mappedNames = mapping.operations.map((entry) => entry.operation);
 
-  assert.equal(runtimeNames.length, 69);
+  assert.equal(runtimeNames.length, 70);
   assert.deepEqual(mappedNames, runtimeNames);
   const upstreamEntries = mapping.operations.filter((entry) => entry.origin === "upstream");
   const localEntries = mapping.operations.filter((entry) => entry.origin === "miku-backlog-api");
@@ -30,6 +30,7 @@ test("all upstream operations have deterministic source and test mappings", () =
     "download_issue_attachment",
     "download_shared_file",
     "download_wiki_attachment",
+    "get_issue_participants",
     "get_project_statuses",
     "get_rate_limit",
     "get_shared_files",
@@ -84,6 +85,7 @@ test("all operations expose machine-readable agent contracts", () => {
 
 test("mutation classification preserves unusual upstream names", () => {
   assert.equal(classifyMutation("get_issue"), "read");
+  assert.equal(classifyMutation("get_issue_participants"), "read");
   assert.equal(classifyMutation("get_project_statuses"), "read");
   assert.equal(classifyMutation("list_organizations"), "read");
   assert.equal(classifyMutation("get_related_issues"), "read");
@@ -95,6 +97,7 @@ test("mutation classification preserves unusual upstream names", () => {
   assert.equal(classifyMutation("remove_related_issue"), "destructive");
   assert.equal(classifyMutation("reset_unread_notification_count"), "broad-mutation");
   assert.equal(requiredPermission("get_issue"), "READ");
+  assert.equal(requiredPermission("get_issue_participants"), "READ");
   assert.equal(requiredPermission("get_project_statuses"), "READ");
   assert.equal(requiredPermission("list_organizations"), "READ");
   assert.equal(requiredPermission("get_related_issues"), "READ");
