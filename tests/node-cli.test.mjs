@@ -18,7 +18,7 @@ test("package exposes the canonical and compatibility CLI names", () => {
 test("CLI metadata commands do not require credentials", () => {
   const version = run(["--version"]);
   assert.equal(version.status, 0);
-  assert.equal(version.stdout, "0.7.8\n");
+  assert.equal(version.stdout, "0.7.9\n");
   assert.equal(version.stderr, "");
 
   const help = run(["--help"]);
@@ -46,7 +46,7 @@ test("CLI metadata commands do not require credentials", () => {
 
   const catalog = JSON.parse(run(["tools", "list"]).stdout);
   assert.equal(catalog.product.name, "miku-backlog-api");
-  assert.equal(catalog.product.version, "0.7.8");
+  assert.equal(catalog.product.version, "0.7.9");
   assert.equal(catalog.operations.length, 69);
   assert.equal(
     catalog.operations.find((operation) => operation.name === "get_issue").requiredPermission,
