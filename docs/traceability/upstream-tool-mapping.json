@@ -10,7 +10,7 @@
   "target": {
     "repository": "miku-backlog-api",
     "product": "miku-backlog-api",
-    "version": "0.7.8",
+    "version": "0.7.9",
     "strategy": "published-handler-direct-invocation"
   },
   "operations": [
