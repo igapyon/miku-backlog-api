@@ -9,12 +9,17 @@
 
 ## miku-soft Maintenance Reference
 
-- checked date: 2026-07-22
+- checked date: 2026-09-30
 - skill: `igapyon-miku-soft-developer`
-- reference branch: `igapyon-agent-skills` `devel`
-- remote reference commit: `ffb31ce3740919ea9e0905a72d89308299f5c021`
+- skill commit: `7af1d7aeba98e383c990f8fc355bba703e5ee5d1`
+- source: local `igapyon-agent-skills` checkout; installed skill copy matches
 - workflow: maintenance mode with the Node App workflow
 - architecture reference: `miku-soft-10-mainapp-design.md`
+
+The release artifact-control pilot remains deferred until the product owner
+approves the shared `SHA256SUMS` policy or a documented profile split. The
+current CI already tests Node.js 22 and 24, and the Release workflow builds on
+Node.js 24, so no compatibility workflow change was selected in this check.
 
 ## Upstream Anchor
 
@@ -40,8 +45,8 @@ This repository owns:
 - dry-run and destructive-operation guards
 - environment-level CRUD permission allow-list
 - response-scoped rate-limit metadata and the Node-specific
-  `get_project_statuses`, `get_rate_limit`, `list_organizations`, and archive
-  file operations
+  `get_project_statuses`, `get_rate_limit`, `list_organizations`,
+  `get_wiki_attachments`, and archive file operations
 - upstream source, test, and operation traceability
 - Node build, tests, runtime artifacts, and releases
 
@@ -53,8 +58,8 @@ cross-product integrations.
 
 - preserve every upstream normal tool name as one Node operation
 - expose `get_project_statuses`, `get_rate_limit`, `list_organizations`, and
-  `get_issue_participants` and `get_shared_files` as clearly identified
-  Node-specific operations
+  `get_issue_participants`, `get_shared_files`, and `get_wiki_attachments` as
+  clearly identified Node-specific operations
 - keep attachment and shared-file downloads out of the JSON operation envelope:
   stream them through `openDownload` and the `download` CLI command, emit a
   successful verbose outcome only after the stream completes, and use an

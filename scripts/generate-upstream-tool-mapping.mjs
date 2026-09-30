@@ -31,6 +31,10 @@ const LOCAL_OPERATION_MAPPINGS = new Map([
     targetEntry: "src/core/local-tools.ts",
     targetTest: "tests/issue-participants.test.mjs"
   }],
+  ["get_wiki_attachments", {
+    targetEntry: "src/core/local-tools.ts",
+    targetTest: "tests/wiki-attachments.test.mjs"
+  }],
   ["get_shared_files", {
     targetEntry: "src/core/local-tools.ts",
     targetTest: "tests/download-operations.test.mjs"

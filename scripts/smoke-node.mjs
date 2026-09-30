@@ -13,9 +13,9 @@ for (const args of [["--version"], ["--help"], ["tools", "list"]]) {
 
 const runtime = await import("../bundle/miku-backlog-api-runtime.mjs");
 assert.equal(runtime.product.name, "miku-backlog-api");
-assert.equal(runtime.product.version, "0.7.10");
+assert.equal(runtime.product.version, "0.7.11");
 assert.equal(typeof runtime.openDownload, "function");
-assert.equal(runtime.listOperations().length, 70);
+assert.equal(runtime.listOperations().length, 71);
 assert.equal(
   runtime.listOperations().find((operation) => operation.name === "get_rate_limit")
     ?.requiredPermission,
@@ -38,6 +38,7 @@ assert.equal(
 );
 for (const operationName of [
   "get_shared_files",
+  "get_wiki_attachments",
   "download_issue_attachment",
   "download_wiki_attachment",
   "download_shared_file"

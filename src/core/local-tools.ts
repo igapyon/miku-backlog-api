@@ -5,6 +5,7 @@ interface LocalBacklogClient {
   getRateLimit(): Promise<unknown>;
   getProjectStatuses(projectIdOrKey: string | number): Promise<unknown>;
   getIssueParticipants(issueIdOrKey: string | number): Promise<unknown>;
+  getWikisAttachments(wikiId: number): Promise<unknown>;
   getSharedFiles(
     projectIdOrKey: string | number,
     path: string,
@@ -23,6 +24,10 @@ interface ProjectStatusesInput {
 interface IssueParticipantsInput {
   issueId?: number;
   issueKey?: string;
+}
+
+interface WikiAttachmentsInput {
+  wikiId: number;
 }
 
 interface IssueAttachmentInput {
@@ -100,6 +105,12 @@ const userSchema = z.object({
   lastLoginTime: z.string()
 }).passthrough();
 
+const wikiAttachmentSchema = z.object({
+  id: positiveInteger,
+  name: z.string(),
+  size: z.number().nonnegative()
+}).passthrough();
+
 export function createLocalToolset(backlog: object, options: LocalToolOptions = {}) {
   const client = backlog as LocalBacklogClient;
   return {
@@ -171,6 +182,20 @@ export function createLocalToolset(backlog: object, options: LocalToolOptions = 
         async handler(input: unknown) {
           const { issueId, issueKey } = input as IssueParticipantsInput;
           return client.getIssueParticipants(issueIdOrKey(issueId, issueKey));
+        }
+      },
+      {
+        name: "get_wiki_attachments",
+        description:
+          "Get the files attached to one Backlog Wiki page.",
+        schema: z.object({
+          wikiId: positiveInteger
+        }).strict(),
+        outputSchema: z.array(wikiAttachmentSchema),
+        importantFields: ["id", "name", "size"],
+        async handler(input: unknown) {
+          const { wikiId } = input as WikiAttachmentsInput;
+          return client.getWikisAttachments(wikiId);
         }
       },
       {
