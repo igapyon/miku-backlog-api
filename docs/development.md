@@ -79,6 +79,9 @@ cross-product integrations.
 - generate and commit an upstream tool mapping
 - bundle CLI and importable runtime artifacts separately
 - require a CLI-level confirmation flag for destructive and broad-reset calls
+- intentionally do not implement or expose project deletion because it is too
+  dangerous for this product; the Backlog REST API's support for deletion does
+  not change this miku-backlog-api safety policy
 - default `BACKLOG_API_ALLOWED_PERMISSIONS` to `READ` and treat it as the
   maximum permission boundary for CLI and Node API calls
 - keep API access summaries opt-in with `--verbose` and emit structured JSON on

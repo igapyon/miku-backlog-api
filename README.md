@@ -53,7 +53,11 @@ JSON output.
 - Upstream baseline: `backlog-mcp-server@0.18.0` → `0.20.4`.
 - Rename `addDocument` calls to `add_document`; the old operation name is no
   longer accepted. Its input and CREATE permission are unchanged.
-- `delete_project` is no longer available, following its removal upstream.
+- `delete_project` is intentionally not offered by this product. Deleting a
+  project is highly destructive, so this CLI does not expose the operation even
+  though the Backlog REST API supports project deletion. This is a deliberate
+  miku-backlog-api safety policy: project deletion is outside the product's
+  supported operations.
 - New `add_category` requires CREATE and either a positive `projectId` or a
   `projectKey`, plus `name`.
 - List custom-field search filters now send indexed array parameters, including
