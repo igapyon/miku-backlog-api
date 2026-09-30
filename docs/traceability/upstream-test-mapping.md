@@ -14,11 +14,14 @@ Target test layers:
   - destructive-operation guard
 - `tests/upstream-differential.test.mjs`
   - representative READ, CREATE, UPDATE, and DELETE operations
+  - `add_document` and `add_category` calls, including category project ID/key
+    selection and explicit expected API arguments
+  - list custom-field filter payloads for single and multiple values
   - identical input and mock Backlog responses for the upstream composed MCP
     handler and the Node operation runner
   - API-call argument, result-data, organization-selection, and Backlog-error
     message parity
-  - upstream v0.18.0 field-selection difference and retained Node contract
+  - upstream v0.20.4 field-selection difference and retained Node contract
 - `tests/node-cli.test.mjs`
   - metadata commands and upstream output-field inventory
   - JSON stdout and exit-code behavior

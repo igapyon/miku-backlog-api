@@ -20,8 +20,8 @@ const ISSUE_ID_OR_KEY_OPERATIONS = [
 const PROJECT_ID_OR_KEY_OPERATIONS = [
   "add_pull_request",
   "add_pull_request_comment",
+  "add_category",
   "add_version_milestone",
-  "delete_project",
   "delete_version",
   "get_categories",
   "get_custom_fields",

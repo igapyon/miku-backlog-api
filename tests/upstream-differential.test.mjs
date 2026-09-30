@@ -14,6 +14,30 @@ const translation = {
 
 const cases = [
   {
+    operation: "add_category",
+    permission: "CREATE",
+    method: "postCategories",
+    input: { organization: "TEST", projectId: 10, name: "category fixture" },
+    response: { id: 11, projectId: 10, name: "category fixture", displayOrder: 0 },
+    expectedArgs: [10, { name: "category fixture" }]
+  },
+  {
+    operation: "add_category",
+    permission: "CREATE",
+    method: "postCategories",
+    input: { organization: "TEST", projectId: 0, projectKey: "TEST", name: "key fixture" },
+    response: { id: 12, projectId: 10, name: "key fixture", displayOrder: 1 },
+    expectedArgs: ["TEST", { name: "key fixture" }]
+  },
+  {
+    operation: "add_document",
+    permission: "CREATE",
+    method: "addDocument",
+    input: { organization: "TEST", projectId: 10, title: "document fixture", content: "text" },
+    response: { id: "document-1", projectId: 10, title: "document fixture" },
+    expectedArgs: [{ projectId: 10, title: "document fixture", content: "text" }]
+  },
+  {
     operation: "get_issue",
     permission: "READ",
     method: "getIssue",
@@ -126,11 +150,33 @@ test("representative CRUD operations match upstream composed MCP handlers", asyn
       assert.equal(resolvedOrganization, "TEST");
       assert.deepEqual(nodeResult.result, mcpData(upstreamResult));
       assert.deepEqual(nodeCalls, upstreamCalls);
+      if (fixture.expectedArgs) {
+        assert.deepEqual(nodeCalls, [{ method: fixture.method, args: fixture.expectedArgs }]);
+      }
     });
   }
 });
 
-test("Node preserves GraphQL-style fields while v0.18.0 uses list-only field arrays", async () => {
+test("list custom-field filters use unsuffixed array payloads", async () => {
+  const calls = [];
+  const result = await runOperation("get_issues", {
+    customFields: [
+      { id: 400, type: "list", value: 1 },
+      { id: 401, type: "list", value: [2, 3] }
+    ]
+  }, {
+    registry: { resolveClient: () => mockBacklog("getIssues", [], calls) },
+    env: {},
+    allowedPermissions: ["READ"]
+  });
+  assert.equal(result.success, true);
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0].args[0].customField_400, [1]);
+  assert.deepEqual(calls[0].args[0].customField_401, [2, 3]);
+  assert.equal(Object.hasOwn(calls[0].args[0], "customField_401[]"), false);
+});
+
+test("Node preserves GraphQL-style fields while v0.20.4 uses list-only field arrays", async () => {
   const response = {
     id: 6,
     issueKey: "TEST-6",

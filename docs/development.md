@@ -24,9 +24,9 @@ Node.js 24, so no compatibility workflow change was selected in this check.
 ## Upstream Anchor
 
 - repository: <https://github.com/nulab/backlog-mcp-server>
-- compatibility version: `v0.18.0`
-- checked commit: `1ca465a97d4ec09b96c7b4bece5135004454d2b8`
-- npm package: `backlog-mcp-server@0.18.0`
+- compatibility version: `v0.20.4`
+- checked commit: `7d977af9d00639d17fe2f4f21c03aa9f1ab2fe07`
+- npm package: `backlog-mcp-server@0.20.4`
 - upstream license: MIT
 - disposable checkout: `workplace/upstream/backlog-mcp-server`
 
@@ -74,7 +74,7 @@ cross-product integrations.
 - consume only the upstream package's public root exports; do not rely on
   unexported `build/` subpaths
 - retain the Node CLI's nested GraphQL-style `fields` contract as a local
-  compatibility layer because v0.18.0 exposes list-only field arrays
+  compatibility layer because v0.20.4 exposes list-only field arrays
 - use one generic, tested operation runner instead of duplicating 62 handlers
 - generate and commit an upstream tool mapping
 - bundle CLI and importable runtime artifacts separately

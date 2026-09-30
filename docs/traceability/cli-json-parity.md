@@ -113,7 +113,7 @@ messages.
 The comparison intentionally normalizes away MCP content blocks and the Node
 JSON envelope. A dedicated test records the intentional field-selection
 difference: the Node CLI retains nested GraphQL-style selection while upstream
-v0.18.0 exposes list-only field arrays. MCP token truncation remains excluded.
+v0.20.4 exposes list-only field arrays. MCP token truncation remains excluded.
 Node CRUD permissions, dry-run, verbose access events, destructive
 confirmation, diagnostics, and trace metadata are Node-only behavior and are
 tested separately.

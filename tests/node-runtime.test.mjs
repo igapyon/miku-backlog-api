@@ -22,6 +22,8 @@ test("all upstream operations have deterministic source and test mappings", () =
   const mappedNames = mapping.operations.map((entry) => entry.operation);
 
   assert.equal(runtimeNames.length, 71);
+  assert.equal(runtimeNames.includes("addDocument"), false);
+  assert.equal(runtimeNames.includes("delete_project"), false);
   assert.deepEqual(mappedNames, runtimeNames);
   const upstreamEntries = mapping.operations.filter((entry) => entry.origin === "upstream");
   const localEntries = mapping.operations.filter((entry) => entry.origin === "miku-backlog-api");
@@ -93,9 +95,9 @@ test("mutation classification preserves unusual upstream names", () => {
   assert.equal(classifyMutation("get_related_issues"), "read");
   assert.equal(classifyMutation("add_issue"), "mutation");
   assert.equal(classifyMutation("add_related_issue"), "mutation");
-  assert.equal(classifyMutation("addDocument"), "mutation");
+  assert.equal(classifyMutation("add_document"), "mutation");
+  assert.equal(classifyMutation("add_category"), "mutation");
   assert.equal(classifyMutation("update_issue_comment"), "mutation");
-  assert.equal(classifyMutation("delete_project"), "destructive");
   assert.equal(classifyMutation("remove_related_issue"), "destructive");
   assert.equal(classifyMutation("reset_unread_notification_count"), "broad-mutation");
   assert.equal(requiredPermission("get_issue"), "READ");
@@ -104,12 +106,12 @@ test("mutation classification preserves unusual upstream names", () => {
   assert.equal(requiredPermission("get_project_statuses"), "READ");
   assert.equal(requiredPermission("list_organizations"), "READ");
   assert.equal(requiredPermission("get_related_issues"), "READ");
-  assert.equal(requiredPermission("addDocument"), "CREATE");
+  assert.equal(requiredPermission("add_document"), "CREATE");
+  assert.equal(requiredPermission("add_category"), "CREATE");
   assert.equal(requiredPermission("add_related_issue"), "CREATE");
   assert.equal(requiredPermission("mark_notification_as_read"), "UPDATE");
   assert.equal(requiredPermission("update_issue_comment"), "UPDATE");
   assert.equal(requiredPermission("reset_unread_notification_count"), "UPDATE");
-  assert.equal(requiredPermission("delete_project"), "DELETE");
   assert.equal(requiredPermission("remove_related_issue"), "DELETE");
   assert.throws(
     () => classifyMutation("archive_issue"),

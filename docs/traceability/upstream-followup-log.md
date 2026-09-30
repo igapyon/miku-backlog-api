@@ -1,5 +1,27 @@
 # Upstream Follow-Up Log
 
+## 2026-10-01 — v0.20.4 Compatibility Refresh
+
+- pinned `backlog-mcp-server@0.20.4` and checked upstream tag `v0.20.4` at
+  commit `7d977af9d00639d17fe2f4f21c03aa9f1ab2fe07`
+- aligned the direct `backlog-js@0.20.1` and `zod@4.5.4` dependencies; replaced
+  `zod-to-json-schema` with Zod 4's draft-07 input-schema conversion
+- adopted upstream `add_document` and `add_category`, and removed the
+  upstream-removed `delete_project` operation
+- removed the old `addDocument` name without an alias; callers must use
+  `add_document`. `delete_project` has no replacement in this runtime
+- inherited upstream's list custom-field filter fix: single values become
+  arrays and payload keys omit `[]`, allowing backlog-js to encode indexed
+  parameters instead of sending filters Backlog silently ignores
+- kept the native-content `get_issue_attachment` out of the JSON operation
+  catalog because issue attachments already use the Node-specific streaming
+  download contract
+- regenerated the mapping for 62 normal upstream operations and nine
+  Node-specific operations
+- self-review added differential calls for document creation and category
+  creation by project ID/key, explicit removed-name inventory checks, and
+  regression coverage for list custom-field filter payloads
+
 ## 2026-09-07 — Issue Participant Lookup
 
 - added the product-owned `get_issue_participants` READ operation backed by

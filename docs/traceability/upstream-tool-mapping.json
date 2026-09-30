@@ -2,20 +2,30 @@
   "schemaVersion": 1,
   "upstream": {
     "repository": "https://github.com/nulab/backlog-mcp-server",
-    "version": "0.18.0",
-    "tag": "v0.18.0",
-    "commit": "1ca465a97d4ec09b96c7b4bece5135004454d2b8",
-    "checked": "2026-08-16"
+    "version": "0.20.4",
+    "tag": "v0.20.4",
+    "commit": "7d977af9d00639d17fe2f4f21c03aa9f1ab2fe07",
+    "checked": "2026-10-01"
   },
   "target": {
     "repository": "miku-backlog-api",
     "product": "miku-backlog-api",
-    "version": "0.7.11",
+    "version": "0.8.0",
     "strategy": "published-handler-direct-invocation"
   },
   "operations": [
     {
-      "operation": "addDocument",
+      "operation": "add_category",
+      "toolset": "issue",
+      "mutationClass": "mutation",
+      "origin": "upstream",
+      "upstreamSource": "src/tools/addCategory.ts",
+      "upstreamTest": "src/tools/addCategory.test.ts",
+      "targetEntry": "src/core/run-operation.ts",
+      "targetTest": "tests/upstream-differential.test.mjs"
+    },
+    {
+      "operation": "add_document",
       "toolset": "document",
       "mutationClass": "mutation",
       "origin": "upstream",
@@ -141,16 +151,6 @@
       "origin": "upstream",
       "upstreamSource": "src/tools/deleteIssue.ts",
       "upstreamTest": "src/tools/deleteIssue.test.ts",
-      "targetEntry": "src/core/run-operation.ts",
-      "targetTest": "tests/upstream-differential.test.mjs"
-    },
-    {
-      "operation": "delete_project",
-      "toolset": "project",
-      "mutationClass": "destructive",
-      "origin": "upstream",
-      "upstreamSource": "src/tools/deleteProject.ts",
-      "upstreamTest": "src/tools/deleteProject.test.ts",
       "targetEntry": "src/core/run-operation.ts",
       "targetTest": "tests/upstream-differential.test.mjs"
     },
