@@ -1,0 +1,107 @@
+# Development
+
+## Initial Design Record
+
+- checked date: 2026-07-22
+- repository version: `0.7.10`
+- implementation maturity: beta standalone Node Core/CLI
+- split source: `backlog-api-skills` initial combined implementation
+
+## miku-soft Maintenance Reference
+
+- checked date: 2026-09-30
+- skill: `igapyon-miku-soft-developer`
+- skill commit: `7af1d7aeba98e383c990f8fc355bba703e5ee5d1`
+- source: local `igapyon-agent-skills` checkout; installed skill copy matches
+- workflow: maintenance mode with the Node App workflow
+- architecture reference: `miku-soft-10-mainapp-design.md`
+
+The release artifact-control pilot remains deferred until the product owner
+approves the shared `SHA256SUMS` policy or a documented profile split. The
+current CI already tests Node.js 22 and 24, and the Release workflow builds on
+Node.js 24, so no compatibility workflow change was selected in this check.
+
+## Upstream Anchor
+
+- repository: <https://github.com/nulab/backlog-mcp-server>
+- compatibility version: `v0.20.4`
+- checked commit: `7d977af9d00639d17fe2f4f21c03aa9f1ab2fe07`
+- npm package: `backlog-mcp-server@0.20.4`
+- upstream license: MIT
+- disposable checkout: `workplace/upstream/backlog-mcp-server`
+
+The runtime imports the published root library API, validates the original Zod
+schemas, and invokes handlers directly. MCP stdio/HTTP transport, resources,
+prompts, OAuth HTTP middleware, and server-side tool registration are not part
+of this Node CLI runtime.
+
+## Repository Boundary
+
+This repository owns:
+
+- TypeScript Node Core/CLI source and operation catalog
+- direct upstream handler invocation
+- JSON envelopes and CLI exit behavior
+- dry-run and destructive-operation guards
+- environment-level CRUD permission allow-list
+- response-scoped rate-limit metadata and the Node-specific
+  `get_project_statuses`, `get_rate_limit`, `list_organizations`,
+  `get_wiki_attachments`, and archive file operations
+- upstream source, test, and operation traceability
+- Node build, tests, runtime artifacts, and releases
+
+The sister `backlog-api-skills` repository owns Agent Skill activation,
+user-facing authorization policy, working context, workflow guidance, and
+cross-product integrations.
+
+## Adopted Decisions
+
+- preserve every upstream normal tool name as one Node operation
+- expose `get_project_statuses`, `get_rate_limit`, `list_organizations`, and
+  `get_issue_participants`, `get_shared_files`, and `get_wiki_attachments` as
+  clearly identified Node-specific operations
+- keep attachment and shared-file downloads out of the JSON operation envelope:
+  stream them through `openDownload` and the `download` CLI command, emit a
+  successful verbose outcome only after the stream completes, and use an
+  atomic no-overwrite file destination
+- derive a terminal Closed status only from the greatest `displayOrder`; do not
+  use localized status names, colors, or fixed IDs
+- keep organization discovery local: validate configuration, return only
+  non-secret metadata, and make no Backlog API call
+- retain the supported `backlog-mcp-server` published-handler dependency until
+  an upstream transport-free boundary exists or a separately reviewed local
+  conversion proves differential parity
+- consume only the upstream package's public root exports; do not rely on
+  unexported `build/` subpaths
+- retain the Node CLI's nested GraphQL-style `fields` contract as a local
+  compatibility layer because v0.20.4 exposes list-only field arrays
+- use one generic, tested operation runner instead of duplicating 62 handlers
+- generate and commit an upstream tool mapping
+- bundle CLI and importable runtime artifacts separately
+- require a CLI-level confirmation flag for destructive and broad-reset calls
+- intentionally do not implement or expose project deletion because it is too
+  dangerous for this product; the Backlog REST API's support for deletion does
+  not change this miku-backlog-api safety policy
+- default `BACKLOG_API_ALLOWED_PERMISSIONS` to `READ` and treat it as the
+  maximum permission boundary for CLI and Node API calls
+- keep API access summaries opt-in with `--verbose` and emit structured JSON on
+  stderr
+- expose only whitelisted resource identifiers and execution metadata; omit
+  content values, full requests/responses, credentials, organization names,
+  personal data, and error messages
+- keep the upstream checkout under ignored `workplace/upstream/`
+
+## Commands
+
+```bash
+npm install
+npm run typecheck
+npm run trace:refresh
+npm test
+npm run smoke:node
+```
+
+Application source lives under `src/` as TypeScript. `npm run build:ts`
+compiles it to `dist/ts/`; esbuild then creates the distributable `.mjs`
+bundles. Tests remain Node ESM JavaScript and exercise the compiled source and
+bundles.

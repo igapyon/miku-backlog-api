@@ -1,0 +1,32 @@
+{
+  "name": "miku-backlog-api",
+  "version": "0.8.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "miku-backlog-api": "dist/cli.mjs",
+    "backlog-api": "dist/cli.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "npm run build:ts && npm run build:node && node --test --test-concurrency=1 tests/*.test.mjs",
+    "build": "npm test",
+    "build:ts": "node scripts/build-typescript.mjs",
+    "build:node": "node scripts/build-node.mjs",
+    "typecheck": "tsc --noEmit",
+    "smoke:node": "node scripts/smoke-node.mjs",
+    "trace:refresh": "npm run build:ts && node scripts/generate-upstream-tool-mapping.mjs"
+  },
+  "dependencies": {
+    "backlog-js": "0.20.1",
+    "backlog-mcp-server": "0.20.4",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "26.1.1",
+    "esbuild": "0.28.1",
+    "typescript": "7.0.2"
+  }
+}
