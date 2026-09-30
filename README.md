@@ -34,10 +34,10 @@ node bundle/miku-backlog-api.mjs download download_issue_attachment --input requ
 ```
 
 The CLI supports all 62 normal tools registered by the checked upstream
-`v0.18.0` source plus eight Node-specific operations: `get_project_statuses`,
+`v0.18.0` source plus nine Node-specific operations: `get_project_statuses`,
 `get_rate_limit`, `list_organizations`, `get_issue_participants`,
-`get_shared_files`, and the three binary download operations. `call` reads one
-JSON object and writes one
+`get_shared_files`, `get_wiki_attachments`, and the three binary download
+operations. `call` reads one JSON object and writes one
 structured JSON envelope containing the result, diagnostics, and upstream
 trace information.
 
@@ -173,6 +173,21 @@ contract.
 printf '{"projectKey":"PROJ","path":"/archive/","count":100}\n' | \
   node bundle/miku-backlog-api.mjs call get_shared_files
 ```
+
+`get_wiki_attachments` is a Node-specific READ operation that lists files
+attached to one Wiki page. It accepts a positive `wikiId` and calls Backlog's
+`GET /api/v2/wikis/:wikiId/attachments` endpoint. The response preserves the
+attachment metadata, including `id`, `name`, and `size`; use `fields` to select
+the values needed by an archive. This list operation is separate from
+`download_wiki_attachment`, which streams one attachment's bytes.
+
+```bash
+printf '{"wikiId":12345,"fields":"{ id name size }"}\n' | \
+  node bundle/miku-backlog-api.mjs call get_wiki_attachments
+```
+
+The usual organization, permission, dry-run, trace, and sanitized verbose
+rules apply.
 
 `download_issue_attachment`, `download_wiki_attachment`, and
 `download_shared_file` open Backlog binary responses as streams. They are READ

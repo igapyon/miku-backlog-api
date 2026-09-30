@@ -25,9 +25,12 @@
 - [x] Implement [Issue #37](https://github.com/igapyon/miku-backlog-api/issues/37):
       add the `get_issue_participants` READ contract with the standard issue
       identifier, organization, fields, dry-run, trace, and verbose behavior.
-- [ ] In a separately approved SCM action, review the diff, prepare an evidence
-      comment, and close [Issue #32](https://github.com/igapyon/miku-backlog-api/issues/32).
-- [ ] After #37 is merged, close [Issue #37](https://github.com/igapyon/miku-backlog-api/issues/37).
+- [x] Implement [Issue #39](https://github.com/igapyon/miku-backlog-api/issues/39):
+      add the `get_wiki_attachments` READ contract for Wiki ID lookup, attachment
+      metadata, permission policy, traceability, and CLI documentation.
+- [x] Close [Issue #32](https://github.com/igapyon/miku-backlog-api/issues/32) on GitHub.
+- [x] Close [Issue #37](https://github.com/igapyon/miku-backlog-api/issues/37) on GitHub.
+- [ ] After #39 is merged, close [Issue #39](https://github.com/igapyon/miku-backlog-api/issues/39).
 
 ## `miku-` Prefix Rename
 
