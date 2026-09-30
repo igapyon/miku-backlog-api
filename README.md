@@ -21,7 +21,7 @@ repository.
 ## Node CLI
 
 `miku-backlog-api` is the canonical command and bundle name. The package also
-provides `backlog-api` as a compatibility command alias throughout the `0.7.x`
+provides `backlog-api` as a compatibility command alias throughout the `0.8.x`
 release line; new scripts and documentation use the canonical name.
 
 ```bash
@@ -34,7 +34,7 @@ node bundle/miku-backlog-api.mjs download download_issue_attachment --input requ
 ```
 
 The CLI supports all 62 normal tools registered by the checked upstream
-`v0.18.0` source plus nine Node-specific operations: `get_project_statuses`,
+`v0.20.4` source plus nine Node-specific operations: `get_project_statuses`,
 `get_rate_limit`, `list_organizations`, `get_issue_participants`,
 `get_shared_files`, `get_wiki_attachments`, and the three binary download
 operations. `call` reads one JSON object and writes one
@@ -48,9 +48,25 @@ permission metadata, confirmation requirements, and curated examples when
 available. `call <operation> --help` is an alias for the same credential-free
 JSON output.
 
+### Changes in 0.8.0
+
+- Upstream baseline: `backlog-mcp-server@0.18.0` → `0.20.4`.
+- Rename `addDocument` calls to `add_document`; the old operation name is no
+  longer accepted. Its input and CREATE permission are unchanged.
+- `delete_project` is no longer available, following its removal upstream.
+- New `add_category` requires CREATE and either a positive `projectId` or a
+  `projectKey`, plus `name`.
+- List custom-field search filters now send indexed array parameters, including
+  single values. Previously these filters could be silently ignored by Backlog.
+- Input JSON Schema uses Zod 4's draft-07 input conversion; regenerate cached
+  operation descriptions with `tools describe`.
+
+See the [upstream follow-up log](docs/traceability/upstream-followup-log.md) for
+the dependency and runtime boundary decisions.
+
 ### Issue updates and relations
 
-The v0.18.0 compatibility baseline includes `update_issue_comment`,
+The v0.20.4 compatibility baseline includes `update_issue_comment`,
 `get_related_issues`, `add_related_issue`, and `remove_related_issue`.
 `update_issue` also accepts an optional `parentIssueId`. Use `tools describe`
 for the exact input schema before calling an operation.
@@ -262,10 +278,10 @@ with the Node CLI's GraphQL-style syntax:
 ```
 
 The CLI validates `fields` before invoking Backlog and always preserves its
-JSON result envelope. Upstream v0.18.0 uses a list-only field array, so this
+JSON result envelope. Upstream v0.20.4 uses a list-only field array, so this
 Node-specific nested selection remains a documented compatibility layer.
 `tools describe` exposes upstream field names as `outputFields`; it does not
-synthesize an `outputFieldSchema` because v0.18.0 no longer provides recursive
+synthesize an `outputFieldSchema` because v0.20.4 no longer provides recursive
 output value schemas. Upstream token-count truncation is not exposed because
 cutting serialized JSON can produce an invalid or ambiguous result; use
 `fields` to reduce output instead.

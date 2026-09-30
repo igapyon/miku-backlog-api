@@ -1,5 +1,5 @@
 import { allTools } from "backlog-mcp-server";
-import { zodToJsonSchema } from "zod-to-json-schema";
+import { z, type ZodType } from "zod";
 import type { BacklogClientRegistry, CrudPermission, MutationClass } from "./contracts.js";
 import { createLocalToolset } from "./local-tools.js";
 import { getAlternativeFieldConstraints } from "./operation-input-constraints.js";
@@ -58,7 +58,8 @@ const OPERATION_POLICIES = new Map<string, OperationPolicy>([
     "download_shared_file"
   ], "read", "READ"),
   ...policyEntries([
-    "addDocument",
+    "add_document",
+    "add_category",
     "add_issue",
     "add_issue_comment",
     "add_project",
@@ -83,7 +84,6 @@ const OPERATION_POLICIES = new Map<string, OperationPolicy>([
   ], "mutation", "UPDATE"),
   ...policyEntries([
     "delete_issue",
-    "delete_project",
     "delete_version",
     "delete_watching",
     "remove_related_issue"
@@ -261,18 +261,10 @@ const OPERATION_EXAMPLES = new Map<string, readonly JsonObject[]>([
 ]);
 
 function toJsonSchema(schema: unknown): JsonObject {
-  if (hasToJsonSchema(schema)) {
-    return schema.toJSONSchema();
-  }
-  return zodToJsonSchema(
-    schema as Parameters<typeof zodToJsonSchema>[0],
-    { target: "jsonSchema7" }
-  ) as JsonObject;
-}
-
-function hasToJsonSchema(value: unknown): value is { toJSONSchema(): JsonObject } {
-  return typeof value === "object" && value !== null &&
-    "toJSONSchema" in value && typeof value.toJSONSchema === "function";
+  return z.toJSONSchema(schema as ZodType, {
+    io: "input",
+    target: "draft-07"
+  }) as JsonObject;
 }
 
 function hasOutputSchema(value: object): value is { outputSchema: unknown } {

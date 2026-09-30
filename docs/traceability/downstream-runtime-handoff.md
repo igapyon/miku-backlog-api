@@ -2,10 +2,10 @@
 
 ## Compatibility Baseline
 
-- upstream package: `backlog-mcp-server@0.18.0`
-- upstream tag: `v0.18.0`
-- upstream commit: `1ca465a97d4ec09b96c7b4bece5135004454d2b8`
-- current package version: `0.7.11`
+- upstream package: `backlog-mcp-server@0.20.4`
+- upstream tag: `v0.20.4`
+- upstream commit: `7d977af9d00639d17fe2f4f21c03aa9f1ab2fe07`
+- current package version: `0.8.0`
 - normal upstream operations: 62
 - Node-specific operations: `get_project_statuses`, `get_rate_limit`,
   `list_organizations`, `get_issue_participants`, `get_shared_files`,
@@ -25,7 +25,7 @@
 - preserved `update_issue.parentIssueId`
 - preserved fallback from non-positive `issueId` to `issueKey`
 - replaced unexported upstream module imports with the public root library API
-- retained nested GraphQL-style Node `fields`; upstream v0.18.0 now exposes
+- retained nested GraphQL-style Node `fields`; upstream v0.20.4 exposes
   list-only field arrays and untyped output field names
 - expose upstream operation result fields as `outputFields`; do not synthesize
   `outputFieldSchema` compatibility metadata for those operations
@@ -39,6 +39,14 @@
 - added streamed READ downloads for issue attachments, Wiki attachments, and
   project shared files; Node consumers use `openDownload`, whose `completed`
   promise represents whole-transfer success or failure
+- adopted upstream `add_document` and `add_category` (CREATE) in the normal
+  operation catalog; `delete_project` is no longer exposed after its removal
+  upstream
+- replace downstream `addDocument` calls with `add_document`; the old name
+  has no alias. List custom-field search filters now use array payloads with
+  unsuffixed keys so backlog-js sends correctly indexed query parameters
+- kept upstream's native-content `get_issue_attachment` outside the JSON tool
+  catalog; binary attachments use the Node-specific streamed download API
 - added the `download` CLI command. It keeps binary output separate from JSON,
   writes file destinations atomically without overwrite, and defers successful
   verbose completion until all bytes are consumed
@@ -58,7 +66,7 @@ chosen, rebuild from a clean worktree and provide all of the following:
 3. `bundle/miku-backlog-api-runtime.mjs`
 4. `bundle/miku-backlog-api-sources.tgz`
 5. SHA-256 values calculated from those clean-build artifacts
-6. the v0.18.0 compatibility and safety delta above
+6. the v0.20.4 compatibility and safety delta above
 
 Run `npm run typecheck`, `npm run trace:refresh`, `npm test`, and
 `npm run smoke:node` before recording the runtime identity in

@@ -106,10 +106,10 @@ const mapping = {
   schemaVersion: 1,
   upstream: {
     repository: "https://github.com/nulab/backlog-mcp-server",
-    version: "0.18.0",
-    tag: "v0.18.0",
-    commit: "1ca465a97d4ec09b96c7b4bece5135004454d2b8",
-    checked: "2026-08-16"
+    version: "0.20.4",
+    tag: "v0.20.4",
+    commit: "7d977af9d00639d17fe2f4f21c03aa9f1ab2fe07",
+    checked: "2026-10-01"
   },
   target: {
     repository: "miku-backlog-api",
